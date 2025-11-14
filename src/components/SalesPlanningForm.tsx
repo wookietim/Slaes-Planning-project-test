@@ -65,15 +65,19 @@ const SalesPlanningForm: React.FC<SalesPlanningFormProps> = ({
       <div className="form-header">
         <div className="country-section">
           <label htmlFor="country">country</label>
-          <input
+          <select
             id="country"
-            type="text"
             value={data.country}
             onChange={(e) => handleCountryChange(e.target.value)}
             disabled={isReadOnly}
-            className="country-input"
-            placeholder="Enter country name"
-          />
+            className="country-select"
+          >
+            <option value="">Select a country</option>
+            <option value="USA">USA</option>
+            <option value="Sweden">Sweden</option>
+            <option value="France">France</option>
+            <option value="Mexico">Mexico</option>
+          </select>
         </div>
       </div>
 

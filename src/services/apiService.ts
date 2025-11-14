@@ -1,0 +1,117 @@
+export interface SalesPlanRow {
+  quarter: string;
+  salesGoal: number;
+  actualSales: number;
+  variance: number;
+}
+
+export interface SalesPlan {
+  id: string;
+  country: string;
+  status: string;
+  rows: SalesPlanRow[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface CreateSalesPlanRequest {
+  country: string;
+  status: string;
+  rows: SalesPlanRow[];
+}
+
+export interface UpdateSalesPlanRequest {
+  country: string;
+  status: string;
+  rows: SalesPlanRow[];
+}
+
+class ApiService {
+  private baseUrl = 'http://localhost:3001/api';
+
+  async getAllSalesPlans(): Promise<SalesPlan[]> {
+    const response = await fetch(`${this.baseUrl}/sales-plans`);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch sales plans: ${response.statusText}`);
+    }
+    return response.json();
+  }
+
+  async getSalesPlanById(id: string): Promise<SalesPlan> {
+    const response = await fetch(`${this.baseUrl}/sales-plans/${id}`);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch sales plan: ${response.statusText}`);
+    }
+    return response.json();
+  }
+
+  async createSalesPlan(salesPlan: CreateSalesPlanRequest): Promise<{ id: string; message: string }> {
+    const response = await fetch(`${this.baseUrl}/sales-plans`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(salesPlan),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to create sales plan: ${response.statusText}`);
+    }
+    return response.json();
+  }
+
+  async updateSalesPlan(id: string, salesPlan: UpdateSalesPlanRequest): Promise<{ message: string }> {
+    const response = await fetch(`${this.baseUrl}/sales-plans/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(salesPlan),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to update sales plan: ${response.statusText}`);
+    }
+    return response.json();
+  }
+
+  async deleteSalesPlan(id: string): Promise<{ message: string }> {
+    const response = await fetch(`${this.baseUrl}/sales-plans/${id}`, {
+      method: 'DELETE',
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to delete sales plan: ${response.statusText}`);
+    }
+    return response.json();
+  }
+
+  async getSalesPlansByStatus(status: string): Promise<SalesPlan[]> {
+    const response = await fetch(`${this.baseUrl}/sales-plans/status/${status}`);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch sales plans by status: ${response.statusText}`);
+    }
+    return response.json();
+  }
+
+  async clearAllData(): Promise<{ message: string }> {
+    const response = await fetch(`${this.baseUrl}/sales-plans`, {
+      method: 'DELETE',
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to clear all data: ${response.statusText}`);
+    }
+    return response.json();
+  }
+
+  async healthCheck(): Promise<{ status: string; message: string }> {
+    const response = await fetch(`${this.baseUrl}/health`);
+    if (!response.ok) {
+      throw new Error(`Health check failed: ${response.statusText}`);
+    }
+    return response.json();
+  }
+}
+
+export default new ApiService();

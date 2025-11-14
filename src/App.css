@@ -10,12 +10,29 @@
   margin-bottom: 30px;
   padding-bottom: 20px;
   border-bottom: 2px solid #0058a3;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .app-header h1 {
   color: #0058a3;
   font-size: 28px;
   font-weight: 600;
+  margin: 0;
+}
+
+.app-nav .nav-link {
+  color: #0058a3;
+  text-decoration: none;
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.app-nav .nav-link:hover {
+  background-color: #f0f8ff;
 }
 
 .app-main {
@@ -60,6 +77,26 @@
 .country-input:focus {
   outline: none;
   border-color: #0058a3;
+}
+
+.country-select {
+  padding: 8px 12px;
+  border: 2px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  width: 200px;
+  background-color: white;
+  cursor: pointer;
+}
+
+.country-select:focus {
+  outline: none;
+  border-color: #0058a3;
+}
+
+.country-select:disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
 }
 
 /* Grid Layout */
@@ -185,6 +222,33 @@
 
 .add-row-btn:active {
   transform: translateY(0);
+}
+
+/* Under Review Message Styles */
+.under-review-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 20px;
+  background-color: #fff3e0;
+  border: 2px solid #f57c00;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.review-status {
+  font-size: 18px;
+  font-weight: 600;
+  color: #f57c00;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.under-review-message p {
+  margin: 0;
+  color: #666;
+  font-size: 14px;
 }
 
 /* Workflow Controls Styles */
@@ -604,4 +668,322 @@
   .data-table td {
     padding: 8px 10px;
   }
+}
+
+/* Login Page Styles */
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #0058a3 0%, #004080 100%);
+  padding: 20px;
+}
+
+.login-container {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  padding: 40px;
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+}
+
+.login-header h1 {
+  color: #0058a3;
+  font-size: 28px;
+  font-weight: 600;
+  margin: 0 0 10px 0;
+}
+
+.login-header h2 {
+  color: #666;
+  font-size: 18px;
+  font-weight: 400;
+  margin: 0 0 30px 0;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-group {
+  text-align: left;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #333;
+  font-size: 14px;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: border-color 0.2s ease;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #0058a3;
+}
+
+.form-group input::placeholder {
+  color: #999;
+}
+
+.login-btn {
+  background-color: #0058a3;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 14px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 10px;
+}
+
+.login-btn:hover {
+  background-color: #004080;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 88, 163, 0.3);
+}
+
+.login-btn:active {
+  transform: translateY(0);
+}
+
+.login-footer {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #eee;
+}
+
+.login-footer p {
+  color: #666;
+  font-size: 12px;
+  margin: 0;
+  font-style: italic;
+}
+
+/* Responsive Design for Login */
+@media (max-width: 480px) {
+  .login-container {
+    padding: 30px 20px;
+  }
+  
+  .login-header h1 {
+    font-size: 24px;
+  }
+  
+  .login-header h2 {
+    font-size: 16px;
+  }
+}
+
+/* Data Management Page Styles */
+.data-management-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: white;
+  min-height: 100vh;
+}
+
+.data-management-container {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.data-management-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 2px solid #0058a3;
+  margin-bottom: 20px;
+}
+
+.data-management-header h1 {
+  color: #0058a3;
+  font-size: 28px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.header-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.entries-stats {
+  padding: 0 20px 20px;
+  color: #666;
+  font-size: 14px;
+}
+
+.entries-stats p {
+  margin: 0;
+}
+
+.no-entries {
+  text-align: center;
+  padding: 40px;
+}
+
+.no-entries p {
+  color: #666;
+  font-size: 16px;
+  margin-bottom: 20px;
+}
+
+.entries-table {
+  padding: 0 20px 20px;
+  overflow-x: auto;
+}
+
+.entries-table table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.entries-table th,
+.entries-table td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.entries-table th {
+  background-color: #0058a3;
+  color: white;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.entries-table td {
+  font-size: 14px;
+}
+
+.entries-table tbody tr:hover {
+  background-color: #f8f9fa;
+}
+
+.country-cell {
+  font-weight: 600;
+  color: #333;
+}
+
+.quarters-cell {
+  text-align: center;
+}
+
+.status-cell {
+  text-align: center;
+}
+
+.date-cell {
+  font-size: 12px;
+  color: #666;
+}
+
+.actions-cell {
+  display: flex;
+  gap: 5px;
+  justify-content: center;
+}
+
+.small-btn {
+  padding: 6px 12px;
+  font-size: 12px;
+  min-width: auto;
+}
+
+.edit-btn {
+  background-color: #2196f3;
+  color: white;
+}
+
+.edit-btn:hover {
+  background-color: #1976d2;
+}
+
+.delete-btn {
+  background-color: #f44336;
+  color: white;
+}
+
+.delete-btn:hover {
+  background-color: #d32f2f;
+}
+
+.export-btn {
+  background-color: #4caf50;
+  color: white;
+}
+
+.export-btn:hover {
+  background-color: #45a049;
+}
+
+.danger-btn {
+  background-color: #f44336;
+  color: white;
+}
+
+.danger-btn:hover {
+  background-color: #d32f2f;
+}
+
+.primary-btn {
+  background-color: #0058a3;
+  color: white;
+}
+
+.primary-btn:hover {
+  background-color: #004080;
+}
+
+.status-badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-draft {
+  background-color: #e3f2fd;
+  color: #1976d2;
+}
+
+.status-review {
+  background-color: #fff3e0;
+  color: #f57c00;
+}
+
+.status-approved {
+  background-color: #e8f5e8;
+  color: #388e3c;
+}
+
+.status-published {
+  background-color: #f3e5f5;
+  color: #7b1fa2;
 }

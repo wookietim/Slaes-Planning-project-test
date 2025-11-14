@@ -1,5 +1,4 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 import { WorkflowStatus, SalesData } from '../types';
 
 interface WorkflowControlsProps {
@@ -17,18 +16,35 @@ const WorkflowControls: React.FC<WorkflowControlsProps> = ({
   salesData,
   onDataReset
 }) => {
-  const navigate = useNavigate();
-
   const handleSendForReview = () => {
     if (isDataValid) {
       alert('Data has been sent for review successfully!');
-      // Navigate to review page with the sales data
-      navigate('/review', { state: { salesData } });
-    }
-  };
+      
+      // Send email notification
+      const reviewUrl = `${window.location.origin}/review`;
+      const emailSubject = 'Sales Planning Data Ready for Review';
+      const emailBody = `Hello,
 
-  const handleApprove = () => {
-    onStatusChange('approved');
+A new set of sales planning data is ready for your review.
+
+Country: ${salesData.country}
+Number of quarters: ${salesData.rows.length}
+
+Please click the following link to review the data:
+${reviewUrl}
+
+Best regards,
+IKEA Sales Planning System`;
+
+      // Create mailto link
+      const mailtoLink = `mailto:timothy.collins@ingka.ikea.com?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
+      
+      // Open email client
+      window.open(mailtoLink);
+      
+      // Change status to review but stay on the same page
+      onStatusChange('review');
+    }
   };
 
   const handlePublish = () => {
@@ -84,12 +100,10 @@ const WorkflowControls: React.FC<WorkflowControlsProps> = ({
         )}
 
         {currentStatus === 'review' && (
-          <button
-            className="btn approve"
-            onClick={handleApprove}
-          >
-            Approved
-          </button>
+          <div className="under-review-message">
+            <span className="review-status">Under Review</span>
+            <p>Data has been sent for review. Please wait for approval.</p>
+          </div>
         )}
 
         {currentStatus === 'approved' && (
