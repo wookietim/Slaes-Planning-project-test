@@ -51,6 +51,15 @@ const ReviewPage: React.FC = () => {
     }
   };
 
+  // Group sales plans by country
+  const groupedByCountry = salesPlans.reduce((acc, plan) => {
+    if (!acc[plan.country]) {
+      acc[plan.country] = [];
+    }
+    acc[plan.country].push(plan);
+    return acc;
+  }, {} as Record<string, SalesPlan[]>);
+
   const selectedPlan = salesPlans.find(plan => plan.id === selectedPlanId);
   
   // Convert API format to component format for compatibility
@@ -120,6 +129,45 @@ const ReviewPage: React.FC = () => {
           entryId: selectedPlan.id
         } 
       });
+    } catch (error) {
+      console.error('Failed to disapprove sales plan:', error);
+      alert('Failed to disapprove the sales plan. Please try again.');
+    }
+  };
+
+  const handleApprovePlan = async (plan: SalesPlan) => {
+    try {
+      await apiService.updateSalesPlan(plan.id, {
+        country: plan.country,
+        status: 'approved',
+        rows: plan.rows
+      });
+      
+      alert(`${plan.country} sales plan has been approved! ${reviewComment ? `Comment: ${reviewComment}` : ''}`);
+      loadSalesPlansForReview(); // Reload to update the list
+    } catch (error) {
+      console.error('Failed to approve sales plan:', error);
+      alert('Failed to approve the sales plan. Please try again.');
+    }
+  };
+
+  const handleDisapprovePlan = async (plan: SalesPlan) => {
+    const comment = reviewComment.trim();
+    if (!comment) {
+      alert('Please provide a comment explaining why the data is disapproved.');
+      return;
+    }
+    
+    try {
+      await apiService.updateSalesPlan(plan.id, {
+        country: plan.country,
+        status: 'draft',
+        rows: plan.rows
+      });
+      
+      alert(`${plan.country} sales plan has been disapproved. Reason: ${comment}`);
+      loadSalesPlansForReview(); // Reload to update the list
+      setReviewComment(''); // Clear the comment
     } catch (error) {
       console.error('Failed to disapprove sales plan:', error);
       alert('Failed to disapprove the sales plan. Please try again.');
@@ -211,42 +259,73 @@ const ReviewPage: React.FC = () => {
           )}
           
           <div className="data-summary">
-            <h2>Submitted Data</h2>
+            <h2>Sales Plans by Country</h2>
             
-            <div className="country-info">
-              <strong>Country:</strong> {salesData.country}
-            </div>
-
-            <div className="data-table">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Quarter</th>
-                    <th>HFB</th>
-                    <th>Turnover</th>
-                    <th>Profit</th>
-                    <th>Quantity</th>
-                    <th>Gross Margin</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {salesData.rows.map((row) => (
-                    <tr key={row.id}>
-                      <td>{row.quarter}</td>
-                      <td>{row.hfb}</td>
-                      <td>{row.turnover}</td>
-                      <td>{row.profit}</td>
-                      <td>{row.qty}</td>
-                      <td>{row.gm}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            {Object.entries(groupedByCountry).map(([country, plans]) => (
+              <div key={country} className="country-section">
+                <h3 className="country-header">{country}</h3>
+                
+                {plans.map((plan) => (
+                  <div key={plan.id} className="plan-section">
+                    <div className="plan-info">
+                      <span className="plan-date">
+                        Created: {new Date(plan.createdAt).toLocaleDateString()}
+                      </span>
+                      <span className="plan-updated">
+                        Updated: {new Date(plan.updatedAt).toLocaleDateString()}
+                      </span>
+                      <span className="plan-status">Status: {plan.status}</span>
+                    </div>
+                    
+                    <div className="data-table">
+                      <table>
+                        <thead>
+                          <tr>
+                            <th>Quarter</th>
+                            <th>Sales Goal</th>
+                            <th>Actual Sales</th>
+                            <th>Variance</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {plan.rows.map((row, index) => (
+                            <tr key={`${plan.id}-${index}`}>
+                              <td>{row.quarter}</td>
+                              <td>{row.salesGoal.toLocaleString()}</td>
+                              <td>{row.actualSales.toLocaleString()}</td>
+                              <td className={row.variance >= 0 ? 'positive-variance' : 'negative-variance'}>
+                                {row.variance > 0 ? '+' : ''}{row.variance.toLocaleString()}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                    
+                    <div className="plan-actions">
+                      <button 
+                        className="btn approve-btn"
+                        onClick={() => handleApprovePlan(plan)}
+                      >
+                        ✓ Approve This Plan
+                      </button>
+                      
+                      <button 
+                        className="btn disapprove-btn"
+                        onClick={() => handleDisapprovePlan(plan)}
+                      >
+                        ✗ Disapprove This Plan
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ))}
           </div>
 
           <div className="review-section">
-            <h2>Review Decision</h2>
+            <h2>General Review Comments</h2>
+            <p>Use the comments below when approving or disapproving individual plans above.</p>
             
             <div className="comment-section">
               <label htmlFor="reviewComment">
@@ -260,22 +339,6 @@ const ReviewPage: React.FC = () => {
                 rows={4}
                 className="review-textarea"
               />
-            </div>
-
-            <div className="review-actions">
-              <button 
-                className="btn approve-btn"
-                onClick={handleApprove}
-              >
-                ✓ Approve
-              </button>
-              
-              <button 
-                className="btn disapprove-btn"
-                onClick={handleDisapprove}
-              >
-                ✗ Disapprove
-              </button>
             </div>
           </div>
         </div>
