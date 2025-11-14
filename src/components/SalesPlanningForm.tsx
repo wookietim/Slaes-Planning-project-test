@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { SalesData, SalesDataRow } from '../types';
 
 interface SalesPlanningFormProps {
@@ -12,12 +12,19 @@ const SalesPlanningForm: React.FC<SalesPlanningFormProps> = ({
   onDataChange,
   isReadOnly = false
 }) => {
+  const [hfbFilter, setHfbFilter] = useState<string>('All');
+
   const handleCountryChange = (value: string) => {
     onDataChange({
       ...data,
       country: value
     });
   };
+
+  // Filter rows based on selected HFB filter
+  const filteredRows = hfbFilter === 'All' 
+    ? data.rows 
+    : data.rows.filter(row => row.hfb === hfbFilter);
 
   const handleRowChange = (rowId: string, field: keyof Omit<SalesDataRow, 'id'>, value: string) => {
     const updatedRows = data.rows.map(row => 
@@ -64,7 +71,7 @@ const SalesPlanningForm: React.FC<SalesPlanningFormProps> = ({
     <div className="sales-planning-form">
       <div className="form-header">
         <div className="country-section">
-          <label htmlFor="country">country</label>
+          <label htmlFor="country">Country</label>
           <select
             id="country"
             value={data.country}
@@ -81,28 +88,76 @@ const SalesPlanningForm: React.FC<SalesPlanningFormProps> = ({
         </div>
       </div>
 
+      <div className="hfb-filters">
+        <div className="filter-section">
+          <label htmlFor="hfbFilter">Filter by HFB:</label>
+          <div className="filter-buttons">
+            <button 
+              type="button"
+              className={`filter-btn ${hfbFilter === 'All' ? 'active' : ''}`}
+              onClick={() => setHfbFilter('All')}
+            >
+              All
+            </button>
+            <button 
+              type="button"
+              className={`filter-btn ${hfbFilter === 'Sales' ? 'active' : ''}`}
+              onClick={() => setHfbFilter('Sales')}
+            >
+              Sales
+            </button>
+            <button 
+              type="button"
+              className={`filter-btn ${hfbFilter === 'Holiday' ? 'active' : ''}`}
+              onClick={() => setHfbFilter('Holiday')}
+            >
+              Holiday
+            </button>
+            <button 
+              type="button"
+              className={`filter-btn ${hfbFilter === 'General' ? 'active' : ''}`}
+              onClick={() => setHfbFilter('General')}
+            >
+              General
+            </button>
+            <button 
+              type="button"
+              className={`filter-btn ${hfbFilter === 'Special' ? 'active' : ''}`}
+              onClick={() => setHfbFilter('Special')}
+            >
+              Special
+            </button>
+          </div>
+        </div>
+      </div>
+
       <div className="form-grid">
         <div className="grid-headers">
           <div className="header-cell">Quarter</div>
-          <div className="header-cell">hfb</div>
-          <div className="header-cell">turnover</div>
-          <div className="header-cell">profit</div>
-          <div className="header-cell">qty</div>
-          <div className="header-cell">gm</div>
+          <div className="header-cell">HFB</div>
+          <div className="header-cell">Turnover</div>
+          <div className="header-cell">Profit</div>
+          <div className="header-cell">Qty</div>
+          <div className="header-cell">GM</div>
           <div className="header-cell">Actions</div>
         </div>
 
-        {data.rows.map((row) => (
+        {filteredRows.map((row) => (
           <div key={row.id} className="grid-row">
             <div className="row-label">{row.quarter}</div>
             <div className="input-cell">
-              <input
-                type="text"
+              <select
                 value={row.hfb}
                 onChange={(e) => handleRowChange(row.id, 'hfb', e.target.value)}
                 disabled={isReadOnly}
-                placeholder="Enter HFB"
-              />
+                className="hfb-select"
+              >
+                <option value="">Select HFB</option>
+                <option value="Sales">Sales</option>
+                <option value="Holiday">Holiday</option>
+                <option value="General">General</option>
+                <option value="Special">Special</option>
+              </select>
             </div>
             <div className="input-cell">
               <input

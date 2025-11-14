@@ -147,6 +147,7 @@ const MainPage: React.FC = () => {
           isDataValid={isDataValid()}
           salesData={salesData}
           onDataReset={handleDataReset}
+          currentEntryId={currentEntryId}
         />
       </main>
     </div>

@@ -7,6 +7,7 @@ interface WorkflowControlsProps {
   isDataValid: boolean;
   salesData: SalesData;
   onDataReset?: () => void;
+  currentEntryId?: string | null;
 }
 
 const WorkflowControls: React.FC<WorkflowControlsProps> = ({
@@ -14,14 +15,17 @@ const WorkflowControls: React.FC<WorkflowControlsProps> = ({
   onStatusChange,
   isDataValid,
   salesData,
-  onDataReset
+  onDataReset,
+  currentEntryId
 }) => {
   const handleSendForReview = () => {
     if (isDataValid) {
       alert('Data has been sent for review successfully!');
       
       // Send email notification
-      const reviewUrl = `${window.location.origin}/review`;
+      const reviewUrl = currentEntryId 
+        ? `${window.location.origin}/review?entryId=${currentEntryId}`
+        : `${window.location.origin}/review`;
       const emailSubject = 'Sales Planning Data Ready for Review';
       const emailBody = `Hello,
 
