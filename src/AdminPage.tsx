@@ -10,6 +10,25 @@ interface UsersData {
 }
 
 const AdminPage: React.FC = () => {
+  // Check if current user has reviewer role
+  const checkUserRole = (role: 'inputUser' | 'reviewer'): boolean => {
+    const currentUser = localStorage.getItem('currentUser');
+    if (!currentUser) return false;
+    
+    const userRoles = localStorage.getItem('userRoles');
+    if (!userRoles) return false;
+    
+    try {
+      const roles = JSON.parse(userRoles);
+      return roles[currentUser]?.[role] || false;
+    } catch (error) {
+      console.error('Failed to parse user roles:', error);
+      return false;
+    }
+  };
+
+  const isReviewer = checkUserRole('reviewer');
+  
   const [users, setUsers] = useState<UsersData>({});
   const [currentUser, setCurrentUser] = useState<string>('');
   
@@ -137,9 +156,11 @@ const AdminPage: React.FC = () => {
             <a href="/main" className="tab">
               📋 Main
             </a>
-            <a href="/review" className="tab">
-              📝 Review
-            </a>
+            {isReviewer && (
+              <a href="/review" className="tab">
+                📝 Review
+              </a>
+            )}
             <a href="/published" className="tab">
               📊 Published
             </a>

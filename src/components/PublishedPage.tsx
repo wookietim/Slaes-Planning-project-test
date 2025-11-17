@@ -16,6 +16,25 @@ interface PublishedRowData {
 }
 
 const PublishedPage: React.FC = () => {
+  // Check if current user has reviewer role
+  const checkUserRole = (role: 'inputUser' | 'reviewer'): boolean => {
+    const currentUser = localStorage.getItem('currentUser');
+    if (!currentUser) return false;
+    
+    const userRoles = localStorage.getItem('userRoles');
+    if (!userRoles) return false;
+    
+    try {
+      const roles = JSON.parse(userRoles);
+      return roles[currentUser]?.[role] || false;
+    } catch (error) {
+      console.error('Failed to parse user roles:', error);
+      return false;
+    }
+  };
+
+  const isReviewer = checkUserRole('reviewer');
+  
   const [publishedPlans, setPublishedPlans] = useState<SalesPlan[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -135,9 +154,11 @@ const PublishedPage: React.FC = () => {
             <a href="/main" className="tab">
               📋 Main
             </a>
-            <a href="/review" className="tab">
-              📝 Review
-            </a>
+            {isReviewer && (
+              <a href="/review" className="tab">
+                📝 Review
+              </a>
+            )}
             <button className="tab active">
               📊 Published
             </button>

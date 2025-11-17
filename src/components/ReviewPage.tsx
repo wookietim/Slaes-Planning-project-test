@@ -26,6 +26,31 @@ interface ReviewableRow {
 const ReviewPage: React.FC = () => {
   const location = useLocation();
   const [searchParams] = useSearchParams();
+  
+  // Check if current user has reviewer role
+  const checkUserRole = (role: 'inputUser' | 'reviewer'): boolean => {
+    const currentUser = localStorage.getItem('currentUser');
+    if (!currentUser) return false;
+    
+    const userRoles = localStorage.getItem('userRoles');
+    if (!userRoles) return false;
+    
+    try {
+      const roles = JSON.parse(userRoles);
+      return roles[currentUser]?.[role] || false;
+    } catch (error) {
+      console.error('Failed to parse user roles:', error);
+      return false;
+    }
+  };
+
+  const isReviewer = checkUserRole('reviewer');
+  
+  // Redirect non-reviewers to main page
+  if (!isReviewer) {
+    window.location.href = '/main';
+    return null;
+  }
   const [salesPlans, setSalesPlans] = useState<SalesPlan[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -239,9 +264,11 @@ const ReviewPage: React.FC = () => {
               <a href="/main" className="tab">
                 📋 Main
               </a>
-              <button className="tab active">
-                📝 Review
-              </button>
+              {isReviewer && (
+                <button className="tab active">
+                  📝 Review
+                </button>
+              )}
               <a href="/published" className="tab">
                 📊 Published
               </a>
