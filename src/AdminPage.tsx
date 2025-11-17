@@ -14,6 +14,15 @@ const AdminPage: React.FC = () => {
   const navigate = useNavigate();
   const [users, setUsers] = useState<UsersData>({});
   const [currentUser, setCurrentUser] = useState<string>('');
+  
+  // New user form state
+  const [newUserEmail, setNewUserEmail] = useState<string>('');
+  const [newUserRoles, setNewUserRoles] = useState<UserRoles>({
+    inputUser: true,
+    reviewer: false
+  });
+  const [showAddForm, setShowAddForm] = useState<boolean>(false);
+  const [emailError, setEmailError] = useState<string>('');
 
   const predefinedUsers = [
     'timothy.collins@ingka.ikea.com',
@@ -71,6 +80,54 @@ const AdminPage: React.FC = () => {
     alert('User roles have been saved successfully!');
   };
 
+  // Email validation function
+  const validateEmail = (email: string): string => {
+    if (!email) return 'Email is required';
+    if (!email.includes('@')) return 'Please enter a valid email address';
+    if (!email.includes('.')) return 'Please enter a valid email address';
+    if (users[email]) return 'User already exists';
+    return '';
+  };
+
+  // Handle new user role change
+  const handleNewUserRoleChange = (role: keyof UserRoles, checked: boolean) => {
+    setNewUserRoles(prev => ({
+      ...prev,
+      [role]: checked
+    }));
+  };
+
+  // Add new user function
+  const handleAddUser = () => {
+    const error = validateEmail(newUserEmail);
+    if (error) {
+      setEmailError(error);
+      return;
+    }
+
+    const updatedUsers = {
+      ...users,
+      [newUserEmail]: {
+        inputUser: newUserRoles.inputUser,
+        reviewer: newUserRoles.reviewer
+      }
+    };
+
+    setUsers(updatedUsers);
+    localStorage.setItem('userRoles', JSON.stringify(updatedUsers));
+    
+    // Reset form
+    setNewUserEmail('');
+    setNewUserRoles({ inputUser: true, reviewer: false });
+    setEmailError('');
+    setShowAddForm(false);
+    
+    alert(`User ${newUserEmail} has been added successfully!`);
+  };
+
+  // Get all user emails (predefined + added)
+  const allUserEmails = [...new Set([...predefinedUsers, ...Object.keys(users)])];
+
   return (
     <div className="admin-page">
       <div className="admin-header">
@@ -117,7 +174,7 @@ const AdminPage: React.FC = () => {
                 </tr>
               </thead>
               <tbody>
-                {predefinedUsers.map(email => (
+                {allUserEmails.map(email => (
                   <tr key={email}>
                     <td className="user-email">{email}</td>
                     <td className="role-checkbox">
@@ -170,7 +227,81 @@ const AdminPage: React.FC = () => {
             >
               🔄 Reset to Default
             </button>
+            <button 
+              onClick={() => setShowAddForm(!showAddForm)}
+              className="add-user-button"
+            >
+              👤 Add New User
+            </button>
           </div>
+
+          {showAddForm && (
+            <div className="add-user-form">
+              <h3>Add New User</h3>
+              <div className="form-row">
+                <div className="form-group">
+                  <label htmlFor="newUserEmail">Email Address:</label>
+                  <input
+                    type="email"
+                    id="newUserEmail"
+                    value={newUserEmail}
+                    onChange={(e) => {
+                      setNewUserEmail(e.target.value);
+                      if (emailError) setEmailError('');
+                    }}
+                    placeholder="user@ingka.ikea.com"
+                    className={emailError ? 'error' : ''}
+                  />
+                  {emailError && <span className="error-message">{emailError}</span>}
+                </div>
+              </div>
+              
+              <div className="form-row">
+                <div className="roles-selection">
+                  <label>Roles:</label>
+                  <div className="role-checkboxes">
+                    <label className="role-checkbox-label">
+                      <input
+                        type="checkbox"
+                        checked={newUserRoles.inputUser}
+                        onChange={(e) => handleNewUserRoleChange('inputUser', e.target.checked)}
+                      />
+                      <span>Input User</span>
+                    </label>
+                    <label className="role-checkbox-label">
+                      <input
+                        type="checkbox"
+                        checked={newUserRoles.reviewer}
+                        onChange={(e) => handleNewUserRoleChange('reviewer', e.target.checked)}
+                      />
+                      <span>Reviewer</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <div className="form-actions">
+                <button 
+                  onClick={handleAddUser}
+                  className="add-button"
+                  disabled={!newUserEmail.trim()}
+                >
+                  ✅ Add User
+                </button>
+                <button 
+                  onClick={() => {
+                    setShowAddForm(false);
+                    setNewUserEmail('');
+                    setNewUserRoles({ inputUser: true, reviewer: false });
+                    setEmailError('');
+                  }}
+                  className="cancel-button"
+                >
+                  ❌ Cancel
+                </button>
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="role-descriptions">

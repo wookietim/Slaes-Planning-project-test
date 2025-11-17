@@ -2512,6 +2512,176 @@
   line-height: 1.5;
 }
 
+/* Add User Form Styles */
+.add-user-button {
+  background: #17a2b8;
+  color: white;
+  border: none;
+  padding: 12px 25px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.add-user-button:hover {
+  background: #138496;
+  transform: translateY(-1px);
+}
+
+.add-user-form {
+  background: #f8f9fa;
+  border: 2px solid #0058a3;
+  border-radius: 12px;
+  padding: 25px;
+  margin-top: 25px;
+  position: relative;
+}
+
+.add-user-form h3 {
+  color: #0058a3;
+  margin: 0 0 20px 0;
+  font-size: 20px;
+  text-align: center;
+}
+
+.form-row {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group label {
+  font-weight: 600;
+  color: #0058a3;
+  font-size: 14px;
+}
+
+.form-group input[type="email"] {
+  padding: 12px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: border-color 0.2s ease;
+}
+
+.form-group input[type="email"]:focus {
+  outline: none;
+  border-color: #0058a3;
+  box-shadow: 0 0 0 3px rgba(0, 88, 163, 0.1);
+}
+
+.form-group input[type="email"].error {
+  border-color: #dc3545;
+}
+
+.error-message {
+  color: #dc3545;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.roles-selection {
+  margin: 15px 0;
+}
+
+.roles-selection > label {
+  font-weight: 600;
+  color: #0058a3;
+  font-size: 14px;
+  margin-bottom: 10px;
+  display: block;
+}
+
+.role-checkboxes {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.role-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  color: #333;
+  font-weight: normal !important;
+}
+
+.role-checkbox-label input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  accent-color: #0058a3;
+  cursor: pointer;
+}
+
+.form-actions {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  margin-top: 25px;
+  padding-top: 20px;
+  border-top: 1px solid #ddd;
+}
+
+.add-button {
+  background: #28a745;
+  color: white;
+  border: none;
+  padding: 12px 25px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.add-button:hover:not(:disabled) {
+  background: #218838;
+  transform: translateY(-1px);
+}
+
+.add-button:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.cancel-button {
+  background: #6c757d;
+  color: white;
+  border: none;
+  padding: 12px 25px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cancel-button:hover {
+  background: #5a6268;
+  transform: translateY(-1px);
+}
+
 /* Admin button in navigation */
 .admin-btn {
   background: #6f42c1 !important;
@@ -2547,12 +2717,47 @@
   }
   
   .save-button,
-  .reset-button {
+  .reset-button,
+  .add-user-button {
     width: 100%;
     justify-content: center;
   }
   
   .role-info {
     grid-template-columns: 1fr;
+  }
+
+  .add-user-form {
+    margin-top: 20px;
+  }
+
+  .form-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .form-group {
+    margin-bottom: 15px;
+  }
+
+  .roles-selection {
+    margin: 0;
+  }
+
+  .role-checkboxes {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .form-actions {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .add-button,
+  .cancel-button {
+    width: 100%;
+    justify-content: center;
   }
 }
