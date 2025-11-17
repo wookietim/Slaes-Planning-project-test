@@ -147,7 +147,71 @@ const MainPage: React.FC = () => {
     }
   };
 
+  // Validation function to check if all required fields are filled
+  const validateFormData = (data: SalesData): { isValid: boolean; errors: string[] } => {
+    const errors: string[] = [];
+
+    // Check if country is selected
+    if (!data.country || data.country.trim() === '') {
+      errors.push('Country must be selected');
+    }
+
+    // Check if there are any rows
+    if (!data.rows || data.rows.length === 0) {
+      errors.push('At least one row must be added');
+    } else {
+      // Check each row for required fields
+      data.rows.forEach((row, index) => {
+        const rowNumber = index + 1;
+
+        // Check HFB
+        if (!row.hfb || row.hfb.trim() === '') {
+          errors.push(`Row ${rowNumber}: HFB must be filled`);
+        }
+
+        // Check Tertial
+        if (!row.tertial || row.tertial.trim() === '') {
+          errors.push(`Row ${rowNumber}: Tertial must be filled`);
+        }
+
+        // Check Turnover (Sales Goal)
+        if (!row.turnover || row.turnover.trim() === '' || isNaN(parseFloat(row.turnover))) {
+          errors.push(`Row ${rowNumber}: Turnover must be a valid number`);
+        }
+
+        // Check Profit (Actual Sales)
+        if (!row.profit || row.profit.trim() === '' || isNaN(parseFloat(row.profit))) {
+          errors.push(`Row ${rowNumber}: Profit must be a valid number`);
+        }
+
+        // Check Qty
+        if (!row.qty || row.qty.trim() === '' || isNaN(parseFloat(row.qty))) {
+          errors.push(`Row ${rowNumber}: Qty must be a valid number`);
+        }
+
+        // Check GM (Variance)
+        if (!row.gm || row.gm.trim() === '' || isNaN(parseFloat(row.gm))) {
+          errors.push(`Row ${rowNumber}: GM must be a valid number`);
+        }
+      });
+    }
+
+    return {
+      isValid: errors.length === 0,
+      errors
+    };
+  };
+
   const handleStatusChange = async (status: WorkflowStatus) => {
+    // Validate form data before proceeding
+    const validation = validateFormData(salesData);
+    if (!validation.isValid) {
+      const errorMessage = "Please fix the following issues before proceeding:\n\n" + 
+        validation.errors.map(error => `• ${error}`).join('\n');
+      alert(errorMessage);
+      return;
+    }
+
     setWorkflowStatus(status);
     const currentUser = localStorage.getItem('currentUser');
     
@@ -472,15 +536,7 @@ const MainPage: React.FC = () => {
   };
 
   const isDataValid = () => {
-    if (!salesData.country.trim()) return false;
-    if (!salesData.year.trim()) return false;
-    return salesData.rows.every(row => 
-      row.hfb.trim() !== '' && 
-      row.turnover.trim() !== '' && 
-      row.profit.trim() !== '' && 
-      row.qty.trim() !== '' && 
-      row.gm.trim() !== ''
-    );
+    return validateFormData(salesData).isValid;
   };
 
   return (
