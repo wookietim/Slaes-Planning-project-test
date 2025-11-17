@@ -623,14 +623,16 @@ const MainPage: React.FC = () => {
           data={salesData}
           onDataChange={handleDataChange}
           isReadOnly={workflowStatus === 'published'}
-        />
-        <WorkflowControls
-          currentStatus={workflowStatus}
-          onStatusChange={handleStatusChange}
-          isDataValid={isDataValid()}
-          salesData={salesData}
-          onDataReset={handleDataReset}
-          currentEntryId={currentEntryId}
+          workflowControls={
+            <WorkflowControls
+              currentStatus={workflowStatus}
+              onStatusChange={handleStatusChange}
+              isDataValid={isDataValid()}
+              salesData={salesData}
+              onDataReset={handleDataReset}
+              currentEntryId={currentEntryId}
+            />
+          }
         />
         
         {/* Existing Plans Display */}

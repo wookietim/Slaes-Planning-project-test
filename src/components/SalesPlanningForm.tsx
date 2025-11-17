@@ -5,12 +5,14 @@ interface SalesPlanningFormProps {
   data: SalesData;
   onDataChange: (data: SalesData) => void;
   isReadOnly?: boolean;
+  workflowControls?: React.ReactNode;
 }
 
 const SalesPlanningForm: React.FC<SalesPlanningFormProps> = ({
   data,
   onDataChange,
-  isReadOnly = false
+  isReadOnly = false,
+  workflowControls
 }) => {
   const [hfbFilter, setHfbFilter] = useState<string>('All');
 
@@ -256,6 +258,11 @@ const SalesPlanningForm: React.FC<SalesPlanningFormProps> = ({
           >
             + Add New Tertial
           </button>
+          {workflowControls && (
+            <div className="workflow-controls-inline">
+              {workflowControls}
+            </div>
+          )}
         </div>
       )}
     </div>

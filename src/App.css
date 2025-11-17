@@ -513,6 +513,8 @@
   margin-top: 20px;
   display: flex;
   justify-content: center;
+  align-items: center;
+  gap: 20px;
 }
 
 .add-row-btn {
@@ -540,6 +542,24 @@
   transform: translateY(0);
 }
 
+/* Ensure consistent button styling in add-row-section */
+.add-row-section .add-row-btn,
+.add-row-section .send-for-review {
+  height: 44px;
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  min-width: 160px; /* Ensure buttons have minimum width */
+}
+
 /* Under Review Message Styles */
 .under-review-message {
   display: flex;
@@ -565,6 +585,33 @@
   margin: 0;
   color: #666;
   font-size: 14px;
+}
+
+/* Inline Workflow Controls */
+.workflow-controls-inline {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.workflow-controls-inline .workflow-controls {
+  box-shadow: none;
+  padding: 0;
+  background-color: transparent;
+  gap: 0;
+  flex-direction: row;
+  margin: 0;
+}
+
+.workflow-controls-inline .status-indicator {
+  justify-content: flex-start;
+  display: none; /* Hide status indicator in inline mode */
+}
+
+.workflow-controls-inline .workflow-buttons {
+  margin: 0;
+  display: flex;
+  align-items: center;
 }
 
 /* Workflow Controls Styles */

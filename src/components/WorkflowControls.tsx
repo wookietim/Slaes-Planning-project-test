@@ -87,11 +87,13 @@ IKEA Sales Planning System`;
 
   return (
     <div className="workflow-controls">
-      <div className="status-indicator">
-        <span className={`status-badge ${currentStatus}`}>
-          {getStatusText()}
-        </span>
-      </div>
+      {currentStatus !== 'draft' && (
+        <div className="status-indicator">
+          <span className={`status-badge ${currentStatus}`}>
+            {getStatusText()}
+          </span>
+        </div>
+      )}
 
       <div className="workflow-buttons">
         {currentStatus === 'draft' && (
@@ -101,7 +103,7 @@ IKEA Sales Planning System`;
             disabled={!isDataValid}
             title={!isDataValid ? "Please fill in all required fields" : ""}
           >
-            Send for review, assign reviewer
+            Send For Review
           </button>
         )}
 
