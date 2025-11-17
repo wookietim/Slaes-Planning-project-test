@@ -5,12 +5,33 @@ import apiService, { SalesPlan } from './services/apiService';
 import SalesPlanningForm from './components/SalesPlanningForm.tsx';
 import WorkflowControls from './components/WorkflowControls.tsx';
 import ReviewPage from './components/ReviewPage.tsx';
+import PublishedPage from './components/PublishedPage.tsx';
 import LoginPage from './components/LoginPage.tsx';
 import DataManagementPage from './components/DataManagementPage.tsx';
+import AdminPage from './AdminPage.tsx';
 import './App.css';
 
 const MainPage: React.FC = () => {
   const location = useLocation();
+  
+  // Check if current user has reviewer role
+  const checkUserRole = (role: 'inputUser' | 'reviewer'): boolean => {
+    const currentUser = localStorage.getItem('currentUser');
+    if (!currentUser) return false;
+    
+    const userRoles = localStorage.getItem('userRoles');
+    if (!userRoles) return false;
+    
+    try {
+      const roles = JSON.parse(userRoles);
+      return roles[currentUser]?.[role] || false;
+    } catch (error) {
+      console.error('Failed to parse user roles:', error);
+      return false;
+    }
+  };
+
+  const isReviewer = checkUserRole('reviewer');
   
   const [salesData, setSalesData] = useState<SalesData>({
     country: '',
@@ -228,7 +249,8 @@ const MainPage: React.FC = () => {
             hfb: row.hfb,
             salesGoal: parseFloat(row.turnover) || 0,
             actualSales: parseFloat(row.profit) || 0,
-            variance: parseFloat(row.gm) || 0
+            variance: parseFloat(row.gm) || 0,
+            qty: parseFloat(row.qty) || 0
           }))
         });
       } catch (error) {
@@ -247,7 +269,8 @@ const MainPage: React.FC = () => {
             hfb: row.hfb,
             salesGoal: parseFloat(row.turnover) || 0,
             actualSales: parseFloat(row.profit) || 0,
-            variance: parseFloat(row.gm) || 0
+            variance: parseFloat(row.gm) || 0,
+            qty: parseFloat(row.qty) || 0
           }))
         });
         setCurrentEntryId(result.id);
@@ -302,7 +325,8 @@ const MainPage: React.FC = () => {
         ...updatedRows[rowIndex],
         salesGoal: editingData.salesGoal,
         actualSales: editingData.actualSales,
-        variance: editingData.variance
+        variance: editingData.variance,
+        qty: editingData.qty
       };
 
       // Update the plan in the database
@@ -447,9 +471,9 @@ const MainPage: React.FC = () => {
           status: "review",
           user: "timothy.collins@ingka.ikea.com",
           rows: [
-            {"tertial": "T1", "hfb": "Sales", "salesGoal": 180000, "actualSales": 175000, "variance": -5000},
-            {"tertial": "T2", "hfb": "Sales", "salesGoal": 200000, "actualSales": 210000, "variance": 10000},
-            {"tertial": "T3", "hfb": "Sales", "salesGoal": 190000, "actualSales": 195000, "variance": 5000}
+            {"tertial": "T1", "hfb": "Sales", "salesGoal": 180000, "actualSales": 175000, "variance": -5000, "qty": 720},
+            {"tertial": "T2", "hfb": "Sales", "salesGoal": 200000, "actualSales": 210000, "variance": 10000, "qty": 800},
+            {"tertial": "T3", "hfb": "Sales", "salesGoal": 190000, "actualSales": 195000, "variance": 5000, "qty": 760}
           ]
         },
         // USA 2025
@@ -459,9 +483,9 @@ const MainPage: React.FC = () => {
           status: "review",
           user: "timothy.collins@ingka.ikea.com",
           rows: [
-            {"tertial": "T1", "hfb": "Sales", "salesGoal": 220000, "actualSales": 215000, "variance": -5000},
-            {"tertial": "T2", "hfb": "Sales", "salesGoal": 240000, "actualSales": 250000, "variance": 10000},
-            {"tertial": "T3", "hfb": "Sales", "salesGoal": 230000, "actualSales": 235000, "variance": 5000}
+            {"tertial": "T1", "hfb": "Sales", "salesGoal": 220000, "actualSales": 215000, "variance": -5000, "qty": 880},
+            {"tertial": "T2", "hfb": "Sales", "salesGoal": 240000, "actualSales": 250000, "variance": 10000, "qty": 960},
+            {"tertial": "T3", "hfb": "Sales", "salesGoal": 230000, "actualSales": 235000, "variance": 5000, "qty": 920}
           ]
         },
         // Sweden 2024
@@ -471,9 +495,9 @@ const MainPage: React.FC = () => {
           status: "review", 
           user: "timothy.collins@ingka.ikea.com",
           rows: [
-            {"tertial": "T1", "hfb": "Sales", "salesGoal": 150000, "actualSales": 145000, "variance": -5000},
-            {"tertial": "T2", "hfb": "Sales", "salesGoal": 160000, "actualSales": 170000, "variance": 10000},
-            {"tertial": "T3", "hfb": "Sales", "salesGoal": 155000, "actualSales": 160000, "variance": 5000}
+            {"tertial": "T1", "hfb": "Sales", "salesGoal": 150000, "actualSales": 145000, "variance": -5000, "qty": 580},
+            {"tertial": "T2", "hfb": "Sales", "salesGoal": 160000, "actualSales": 170000, "variance": 10000, "qty": 640},
+            {"tertial": "T3", "hfb": "Sales", "salesGoal": 155000, "actualSales": 160000, "variance": 5000, "qty": 620}
           ]
         },
         // Sweden 2025
@@ -483,9 +507,9 @@ const MainPage: React.FC = () => {
           status: "review",
           user: "timothy.collins@ingka.ikea.com",
           rows: [
-            {"tertial": "T1", "hfb": "Sales", "salesGoal": 170000, "actualSales": 165000, "variance": -5000},
-            {"tertial": "T2", "hfb": "Sales", "salesGoal": 180000, "actualSales": 190000, "variance": 10000},
-            {"tertial": "T3", "hfb": "Sales", "salesGoal": 175000, "actualSales": 180000, "variance": 5000}
+            {"tertial": "T1", "hfb": "Sales", "salesGoal": 170000, "actualSales": 165000, "variance": -5000, "qty": 680},
+            {"tertial": "T2", "hfb": "Sales", "salesGoal": 180000, "actualSales": 190000, "variance": 10000, "qty": 720},
+            {"tertial": "T3", "hfb": "Sales", "salesGoal": 175000, "actualSales": 180000, "variance": 5000, "qty": 700}
           ]
         }
       ];
@@ -551,17 +575,25 @@ const MainPage: React.FC = () => {
           >
             🔄 Reset
           </button>
-          <button 
+          <button
             className="btn sample-data-btn"
             onClick={handleLoadSampleData}
             title="Load sample data (clears existing data)"
           >
             📋 Load Sample Data
           </button>
-          <a href="/review" className="nav-link btn review-btn">
-            📝 Go to Review
+          {isReviewer && (
+            <a href="/review" className="nav-link btn review-btn">
+              📝 Go to Review
+            </a>
+          )}
+          <a href="/published" className="nav-link btn published-btn">
+            📊 View Published
           </a>
-          <a href="/data" className="nav-link">📊 View Saved Data</a>
+          <a href="/admin" className="nav-link btn admin-btn">
+            🔧 Admin Panel
+          </a>
+          <a href="/data" className="nav-link">💾 Saved Data</a>
         </nav>
       </header>
       
@@ -751,7 +783,18 @@ const MainPage: React.FC = () => {
                                     row.actualSales.toLocaleString()
                                   )}
                                 </td>
-                                <td>-</td>
+                                <td>
+                                  {isEditing ? (
+                                    <input
+                                      type="number"
+                                      value={editingData.qty || row.qty || ''}
+                                      onChange={(e) => handleEditFieldChange('qty', e.target.value)}
+                                      className="inline-edit-input"
+                                    />
+                                  ) : (
+                                    row.qty !== undefined && row.qty !== null ? row.qty.toLocaleString() : '-'
+                                  )}
+                                </td>
                                 <td>
                                   {isEditing ? (
                                     <input
@@ -851,7 +894,9 @@ const App: React.FC = () => {
         <Route path="/" element={<LoginPage />} />
         <Route path="/main" element={<MainPage />} />
         <Route path="/review" element={<ReviewPage />} />
+        <Route path="/published" element={<PublishedPage />} />
         <Route path="/data" element={<DataManagementPage />} />
+        <Route path="/admin" element={<AdminPage />} />
       </Routes>
     </Router>
   );

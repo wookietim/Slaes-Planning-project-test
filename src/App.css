@@ -85,6 +85,29 @@
   color: white;
 }
 
+.app-nav .published-btn {
+  background-color: #2196f3;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  text-decoration: none;
+}
+
+.app-nav .published-btn:hover {
+  background-color: #1976d2;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(33, 150, 243, 0.3);
+  color: white;
+}
+
 .app-nav .sample-data-btn {
   background-color: #9c27b0;
   color: white;
@@ -2203,5 +2226,333 @@
   .clear-filters-btn {
     width: 100%;
     margin-top: 10px;
+  }
+}
+
+/* Admin Page Styles */
+.admin-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: white;
+  min-height: 100vh;
+}
+
+.admin-header {
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #0058a3;
+}
+
+.admin-header h1 {
+  color: #0058a3;
+  font-size: 28px;
+  font-weight: 600;
+  margin: 0 0 15px 0;
+}
+
+.admin-nav {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.admin-nav .nav-button {
+  background: #0058a3;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.admin-nav .nav-button:hover {
+  background: #004080;
+  transform: translateY(-1px);
+}
+
+.admin-content {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.current-user-info {
+  background: #f8f9fa;
+  padding: 15px;
+  border-radius: 8px;
+  border-left: 4px solid #0058a3;
+}
+
+.current-user-info h3 {
+  margin: 0;
+  color: #0058a3;
+  font-size: 16px;
+}
+
+.users-management {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 25px;
+}
+
+.users-management h2 {
+  color: #0058a3;
+  margin: 0 0 10px 0;
+  font-size: 24px;
+}
+
+.users-management p {
+  color: #666;
+  margin-bottom: 25px;
+}
+
+.users-table {
+  margin-bottom: 25px;
+}
+
+.users-table table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.users-table th {
+  background: #f8f9fa;
+  padding: 15px;
+  text-align: left;
+  font-weight: 600;
+  color: #0058a3;
+  border-bottom: 2px solid #ddd;
+}
+
+.users-table td {
+  padding: 15px;
+  border-bottom: 1px solid #ddd;
+  vertical-align: middle;
+}
+
+.users-table tr:last-child td {
+  border-bottom: none;
+}
+
+.users-table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.user-email {
+  font-weight: 500;
+  color: #333;
+  font-family: monospace;
+  font-size: 14px;
+}
+
+.role-checkbox {
+  text-align: center;
+}
+
+.role-checkbox label {
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  position: relative;
+}
+
+.role-checkbox input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  cursor: pointer;
+  accent-color: #0058a3;
+}
+
+.role-checkbox .checkmark {
+  margin-left: 8px;
+  color: #0058a3;
+  font-weight: bold;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.role-checkbox input[type="checkbox"]:checked + .checkmark {
+  opacity: 1;
+}
+
+.user-status {
+  text-align: center;
+}
+
+.status-both {
+  background: #28a745;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.status-input {
+  background: #17a2b8;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.status-reviewer {
+  background: #fd7e14;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.status-none {
+  background: #6c757d;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.admin-actions {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.save-button {
+  background: #28a745;
+  color: white;
+  border: none;
+  padding: 12px 25px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.save-button:hover {
+  background: #218838;
+  transform: translateY(-1px);
+}
+
+.reset-button {
+  background: #dc3545;
+  color: white;
+  border: none;
+  padding: 12px 25px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.reset-button:hover {
+  background: #c82333;
+  transform: translateY(-1px);
+}
+
+.role-descriptions {
+  background: #f8f9fa;
+  padding: 25px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+.role-descriptions h3 {
+  color: #0058a3;
+  margin: 0 0 20px 0;
+  font-size: 20px;
+}
+
+.role-info {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.role-item {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+.role-item h4 {
+  color: #0058a3;
+  margin: 0 0 10px 0;
+  font-size: 16px;
+}
+
+.role-item p {
+  color: #666;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Admin button in navigation */
+.admin-btn {
+  background: #6f42c1 !important;
+  color: white !important;
+}
+
+.admin-btn:hover {
+  background: #5a2d91 !important;
+}
+
+/* Responsive Design for Admin Page */
+@media (max-width: 768px) {
+  .admin-nav {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .admin-nav .nav-button {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .users-table {
+    overflow-x: auto;
+  }
+  
+  .users-table table {
+    min-width: 600px;
+  }
+  
+  .admin-actions {
+    flex-direction: column;
+  }
+  
+  .save-button,
+  .reset-button {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .role-info {
+    grid-template-columns: 1fr;
   }
 }

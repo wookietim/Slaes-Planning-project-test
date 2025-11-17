@@ -5,6 +5,7 @@ export interface SalesPlanRow {
   salesGoal: number;
   actualSales: number;
   variance: number;
+  qty?: number; // Quantity field
 }
 
 export interface SalesPlan {
