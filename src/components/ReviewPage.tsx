@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
+import { useLocation, useSearchParams } from 'react-router-dom';
 import { SalesData } from '../types';
 import apiService, { SalesPlan } from '../services/apiService';
 
@@ -24,7 +24,6 @@ interface ReviewableRow {
 }
 
 const ReviewPage: React.FC = () => {
-  const navigate = useNavigate();
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const [salesPlans, setSalesPlans] = useState<SalesPlan[]>([]);
@@ -185,15 +184,6 @@ const ReviewPage: React.FC = () => {
     });
   };
 
-  const handleBackToForm = () => {
-    // Navigate back to main with fresh form (no existing data)
-    navigate('/main', { 
-      state: { 
-        fromReview: true // Flag to indicate coming from review page
-      } 
-    });
-  };
-
   if (loading) {
     return (
       <div className="review-page">
@@ -230,9 +220,7 @@ const ReviewPage: React.FC = () => {
           <h1>Review Page</h1>
           <div className="no-data">
             <p>No sales plans are currently pending review.</p>
-            <button className="btn primary-btn" onClick={() => navigate('/main')}>
-              Back to Form
-            </button>
+            <p>Use the "Main" tab above to create new sales plans.</p>
           </div>
         </div>
       </div>
@@ -242,11 +230,33 @@ const ReviewPage: React.FC = () => {
   return (
     <div className="review-page">
       <div className="review-container">
-        <header className="review-header">
-          <h1>Sales Planning Review - Individual Line Review</h1>
-          <button className="btn back-btn" onClick={handleBackToForm}>
-            ← Back to Form
-          </button>
+        <header className="app-header">
+          <h1>IKEA Sales Planning</h1>
+          
+          {/* Tab Navigation */}
+          <nav className="app-tabs">
+            <div className="tab-container">
+              <a href="/main" className="tab">
+                📋 Main
+              </a>
+              <button className="tab active">
+                📝 Review
+              </button>
+              <a href="/published" className="tab">
+                📊 Published
+              </a>
+              <a href="/admin" className="tab">
+                🔧 Admin
+              </a>
+              <a href="/data" className="tab">
+                💾 Data
+              </a>
+            </div>
+            
+            <div className="app-actions">
+              {/* Navigation handled by tabs - no need for back button */}
+            </div>
+          </nav>
         </header>
 
         <div className="review-content">
@@ -266,9 +276,7 @@ const ReviewPage: React.FC = () => {
               ) : (
                 <p>No sales plan lines are currently pending review.</p>
               )}
-              <button className="btn primary-btn" onClick={() => navigate('/main')}>
-                Back to Form
-              </button>
+              <p>Use the "Main" tab above to create new sales plans.</p>
             </div>
           ) : (
             <div className="individual-review-section">

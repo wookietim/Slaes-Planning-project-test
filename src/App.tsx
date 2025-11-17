@@ -575,33 +575,46 @@ const MainPage: React.FC = () => {
     <div className="app">
       <header className="app-header">
         <h1>IKEA Sales Planning</h1>
-        <nav className="app-nav">
-          <button 
-            className="btn reset-btn"
-            onClick={handleDataReset}
-            title="Reset form and start fresh"
-          >
-            🔄 Reset
-          </button>
-          <button
-            className="btn sample-data-btn"
-            onClick={handleLoadSampleData}
-            title="Load sample data (clears existing data)"
-          >
-            📋 Load Sample Data
-          </button>
-          {isReviewer && (
-            <a href="/review" className="nav-link btn review-btn">
-              📝 Go to Review
+        
+        {/* Tab Navigation */}
+        <nav className="app-tabs">
+          <div className="tab-container">
+            <button className="tab active">
+              📋 Main
+            </button>
+            {isReviewer && (
+              <a href="/review" className="tab">
+                � Review
+              </a>
+            )}
+            <a href="/published" className="tab">
+              📊 Published
             </a>
-          )}
-          <a href="/published" className="nav-link btn published-btn">
-            📊 View Published
-          </a>
-          <a href="/admin" className="nav-link btn admin-btn">
-            🔧 Admin Panel
-          </a>
-          <a href="/data" className="nav-link">💾 Saved Data</a>
+            <a href="/admin" className="tab">
+              🔧 Admin
+            </a>
+            <a href="/data" className="tab">
+              💾 Data
+            </a>
+          </div>
+          
+          {/* Action buttons moved to a separate section */}
+          <div className="app-actions">
+            <button 
+              className="btn reset-btn"
+              onClick={handleDataReset}
+              title="Reset form and start fresh"
+            >
+              🔄 Reset
+            </button>
+            <button
+              className="btn sample-data-btn"
+              onClick={handleLoadSampleData}
+              title="Load sample data (clears existing data)"
+            >
+              � Load Sample Data
+            </button>
+          </div>
         </nav>
       </header>
       

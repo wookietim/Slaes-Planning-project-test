@@ -105,29 +105,50 @@ const DataManagementPage: React.FC = () => {
   return (
     <div className="data-management-page">
       <div className="data-management-container">
-        <header className="data-management-header">
-          <h1>Saved Sales Plans</h1>
-          <div className="header-actions">
-            <button 
-              className="btn back-btn" 
-              onClick={() => navigate('/main')}
-            >
-              ← Back to Form
-            </button>
-            <button 
-              className="btn export-btn" 
-              onClick={handleExportData}
-            >
-              📥 Export Data
-            </button>
-            <button 
-              className="btn danger-btn" 
-              onClick={handleClearAllData}
-            >
-              🗑️ Clear All
-            </button>
-          </div>
+        <header className="app-header">
+          <h1>IKEA Sales Planning</h1>
+          
+          {/* Tab Navigation */}
+          <nav className="app-tabs">
+            <div className="tab-container">
+              <a href="/main" className="tab">
+                📋 Main
+              </a>
+              <a href="/review" className="tab">
+                📝 Review
+              </a>
+              <a href="/published" className="tab">
+                📊 Published
+              </a>
+              <a href="/admin" className="tab">
+                🔧 Admin
+              </a>
+              <button className="tab active">
+                💾 Data
+              </button>
+            </div>
+            
+            <div className="app-actions">
+              <button 
+                className="btn export-btn" 
+                onClick={handleExportData}
+              >
+                📥 Export Data
+              </button>
+              <button 
+                className="btn danger-btn" 
+                onClick={handleClearAllData}
+              >
+                🗑️ Clear All
+              </button>
+            </div>
+          </nav>
         </header>
+
+        <div className="data-section-header">
+          <h2>💾 Saved Sales Plans</h2>
+          <p>View and manage your saved sales planning data.</p>
+        </div>
 
         <div className="entries-stats">
           <p>{entries.length} total entries saved</p>
@@ -147,12 +168,7 @@ const DataManagementPage: React.FC = () => {
         ) : entries.length === 0 ? (
           <div className="no-entries">
             <p>No saved sales plans yet.</p>
-            <button 
-              className="btn primary-btn" 
-              onClick={() => navigate('/main')}
-            >
-              Create Your First Entry
-            </button>
+            <p>Use the "Main" tab above to create your first sales plan.</p>
           </div>
         ) : (
           <div className="entries-table">

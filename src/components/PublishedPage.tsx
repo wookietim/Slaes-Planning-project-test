@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
 import apiService, { SalesPlan } from '../services/apiService';
 import './PublishedPage.css';
 
@@ -17,7 +16,6 @@ interface PublishedRowData {
 }
 
 const PublishedPage: React.FC = () => {
-  const navigate = useNavigate();
   const [publishedPlans, setPublishedPlans] = useState<SalesPlan[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -128,15 +126,34 @@ const PublishedPage: React.FC = () => {
 
   return (
     <div className="published-page">
-      <div className="published-header">
-        <h1>Published Sales Plans</h1>
-        <button 
-          className="btn back-btn"
-          onClick={() => navigate('/main')}
-        >
-          ← Back to Main
-        </button>
-      </div>
+      <header className="app-header">
+        <h1>IKEA Sales Planning</h1>
+        
+        {/* Tab Navigation */}
+        <nav className="app-tabs">
+          <div className="tab-container">
+            <a href="/main" className="tab">
+              📋 Main
+            </a>
+            <a href="/review" className="tab">
+              📝 Review
+            </a>
+            <button className="tab active">
+              📊 Published
+            </button>
+            <a href="/admin" className="tab">
+              🔧 Admin
+            </a>
+            <a href="/data" className="tab">
+              💾 Data
+            </a>
+          </div>
+          
+          <div className="app-actions">
+            {/* Navigation handled by tabs - no need for back button */}
+          </div>
+        </nav>
+      </header>
 
       <div className="published-filters">
         <div className="filter-group">

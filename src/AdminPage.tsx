@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 
 interface UserRoles {
   inputUser: boolean;
@@ -11,7 +10,6 @@ interface UsersData {
 }
 
 const AdminPage: React.FC = () => {
-  const navigate = useNavigate();
   const [users, setUsers] = useState<UsersData>({});
   const [currentUser, setCurrentUser] = useState<string>('');
   
@@ -130,38 +128,47 @@ const AdminPage: React.FC = () => {
 
   return (
     <div className="admin-page">
-      <div className="admin-header">
-        <h1>🔧 Admin Panel - User Role Management</h1>
-        <div className="admin-nav">
-          <button 
-            onClick={() => navigate('/main')}
-            className="nav-button"
-          >
-            📊 Go to Main
-          </button>
-          <button 
-            onClick={() => navigate('/review')}
-            className="nav-button"
-          >
-            🔍 Go to Review
-          </button>
-          <button 
-            onClick={() => navigate('/published')}
-            className="nav-button"
-          >
-            📋 Go to Published
-          </button>
-        </div>
-      </div>
+      <header className="app-header">
+        <h1>IKEA Sales Planning</h1>
+        
+        {/* Tab Navigation */}
+        <nav className="app-tabs">
+          <div className="tab-container">
+            <a href="/main" className="tab">
+              📋 Main
+            </a>
+            <a href="/review" className="tab">
+              📝 Review
+            </a>
+            <a href="/published" className="tab">
+              📊 Published
+            </a>
+            <button className="tab active">
+              🔧 Admin
+            </button>
+            <a href="/data" className="tab">
+              💾 Data
+            </a>
+          </div>
+          
+          <div className="app-actions">
+            {/* Navigation handled by tabs - no need for back button */}
+          </div>
+        </nav>
+      </header>
 
       <div className="admin-content">
+        <div className="admin-section-header">
+          <h2>🔧 Admin Panel - User Role Management</h2>
+          <p>Manage user roles and permissions for the sales planning application.</p>
+        </div>
+        
         <div className="current-user-info">
           <h3>Current User: {currentUser || 'Not logged in'}</h3>
         </div>
 
         <div className="users-management">
-          <h2>User Permissions</h2>
-          <p>Manage user roles and permissions for the sales planning application.</p>
+          <h3>User Permissions</h3>
           
           <div className="users-table">
             <table>
