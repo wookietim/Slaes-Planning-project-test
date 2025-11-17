@@ -139,7 +139,15 @@ const MainPage: React.FC = () => {
   // Handle data from navigation state (when returning from review page)
   useEffect(() => {
     if (location.state) {
-      const { status, salesData: navSalesData, entryId } = location.state as any;
+      const { status, salesData: navSalesData, entryId, fromReview } = location.state as any;
+      
+      // If coming from review page, always start fresh
+      if (fromReview) {
+        handleDataReset();
+        return;
+      }
+      
+      // Otherwise, load the navigation data
       if (status) setWorkflowStatus(status);
       if (navSalesData) setSalesData(navSalesData);
       if (entryId) setCurrentEntryId(entryId);

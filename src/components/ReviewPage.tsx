@@ -30,7 +30,6 @@ const ReviewPage: React.FC = () => {
   const [salesPlans, setSalesPlans] = useState<SalesPlan[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
   const [rowStatuses, setRowStatuses] = useState<Record<string, 'pending' | 'approved' | 'denied' | 'published'>>({});
   const [statusesLoaded, setStatusesLoaded] = useState(false);
 
@@ -77,14 +76,10 @@ const ReviewPage: React.FC = () => {
         // Load specific sales plan
         const salesPlan = await apiService.getSalesPlanById(entryId);
         setSalesPlans([salesPlan]);
-        setSelectedPlanId(entryId);
       } else {
         // Load all sales plans with 'review' status
         const reviewPlans = await apiService.getSalesPlansByStatus('review');
         setSalesPlans(reviewPlans);
-        if (reviewPlans.length > 0) {
-          setSelectedPlanId(reviewPlans[0].id);
-        }
       }
     } catch (err) {
       setError('Failed to load sales plans for review. Make sure the server is running.');
@@ -94,8 +89,6 @@ const ReviewPage: React.FC = () => {
     }
   };
 
-  const selectedPlan = salesPlans.find(plan => plan.id === selectedPlanId);
-  
   // Create flat list of all rows for individual review
   const createReviewableRows = (): ReviewableRow[] => {
     // Don't create rows until statuses are loaded to ensure proper filtering
@@ -193,28 +186,10 @@ const ReviewPage: React.FC = () => {
   };
 
   const handleBackToForm = () => {
-    const backSalesData = selectedPlan ? {
-      country: selectedPlan.country,
-      year: selectedPlan.year || '2025',
-      rows: selectedPlan.rows.map((row, index) => ({
-        id: `${selectedPlan.id}-${index}`,
-        tertial: row.tertial || row.quarter || 'T1',
-        hfb: '',
-        turnover: row.salesGoal.toString(),
-        profit: row.actualSales.toString(),
-        qty: '',
-        gm: row.variance.toString()
-      }))
-    } : {
-      country: 'No data',
-      year: '2025',
-      rows: []
-    };
-    
+    // Navigate back to main with fresh form (no existing data)
     navigate('/main', { 
       state: { 
-        salesData: backSalesData,
-        entryId: selectedPlanId 
+        fromReview: true // Flag to indicate coming from review page
       } 
     });
   };
