@@ -593,9 +593,6 @@ const MainPage: React.FC = () => {
             <a href="/admin" className="tab">
               🔧 Admin
             </a>
-            <a href="/data" className="tab">
-              💾 Data
-            </a>
           </div>
           
           {/* Action buttons moved to a separate section */}
@@ -706,17 +703,6 @@ const MainPage: React.FC = () => {
                 >
                   Clear Filters
                 </button>
-              </div>
-              
-              {/* Filter Results Count */}
-              <div className="filter-results">
-                Showing {getFilteredPlans().length} of {existingPlans.length} plans
-                {filters.status && (
-                  <span className="filter-applied"> (plans with {filters.status.toUpperCase()} rows)</span>
-                )}
-                {(filters.year || filters.country || filters.hfb) && !filters.status && (
-                  <span className="filter-applied"> (filtered)</span>
-                )}
               </div>
             </div>
             
@@ -901,6 +887,17 @@ const MainPage: React.FC = () => {
                     Clear Filters
                   </button>
                 </div>
+              )}
+            </div>
+            
+            {/* Filter Results Count - moved to bottom */}
+            <div className="filter-results">
+              Showing {getFilteredPlans().length} of {existingPlans.length} plans
+              {filters.status && (
+                <span className="filter-applied"> (plans with {filters.status.toUpperCase()} rows)</span>
+              )}
+              {(filters.year || filters.country || filters.hfb) && !filters.status && (
+                <span className="filter-applied"> (filtered)</span>
               )}
             </div>
           </div>

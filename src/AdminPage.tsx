@@ -146,9 +146,6 @@ const AdminPage: React.FC = () => {
             <button className="tab active">
               🔧 Admin
             </button>
-            <a href="/data" className="tab">
-              💾 Data
-            </a>
           </div>
           
           <div className="app-actions">

@@ -123,9 +123,6 @@ const DataManagementPage: React.FC = () => {
               <a href="/admin" className="tab">
                 🔧 Admin
               </a>
-              <button className="tab active">
-                💾 Data
-              </button>
             </div>
             
             <div className="app-actions">

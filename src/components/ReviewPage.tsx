@@ -248,9 +248,6 @@ const ReviewPage: React.FC = () => {
               <a href="/admin" className="tab">
                 🔧 Admin
               </a>
-              <a href="/data" className="tab">
-                💾 Data
-              </a>
             </div>
             
             <div className="app-actions">
