@@ -730,9 +730,6 @@ const MainPage: React.FC = () => {
                           <span className="plan-country-year">{plan.country} ({plan.year})</span>
                           <span className="plan-created">Created: {new Date(plan.createdAt).toLocaleDateString()}</span>
                         </div>
-                        <span className={`plan-status-badge ${plan.status}`}>
-                          {plan.status.toUpperCase()}
-                        </span>
                       </div>
                       
                       <div className="plan-data-table">
