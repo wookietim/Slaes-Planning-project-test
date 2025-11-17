@@ -30,9 +30,10 @@ const DataManagementPage: React.FC = () => {
     // Convert API format back to component format
     const salesData = {
       country: entry.country,
+      year: entry.year || '2025',
       rows: entry.rows.map(row => ({
         id: `${Date.now()}-${Math.random()}`,
-        quarter: row.quarter,
+        tertial: row.tertial,
         hfb: '', // This field isn't used in the new structure
         turnover: row.salesGoal.toString(),
         profit: row.actualSales.toString(),
@@ -159,7 +160,8 @@ const DataManagementPage: React.FC = () => {
               <thead>
                 <tr>
                   <th>Country</th>
-                  <th>Quarters</th>
+                  <th>Year</th>
+                  <th>Tertials</th>
                   <th>Status</th>
                   <th>Created</th>
                   <th>Updated</th>
@@ -170,7 +172,8 @@ const DataManagementPage: React.FC = () => {
                 {entries.map((entry) => (
                   <tr key={entry.id}>
                     <td className="country-cell">{entry.country || 'No country'}</td>
-                    <td className="quarters-cell">{entry.rows.length}</td>
+                    <td className="year-cell">{entry.year || '2025'}</td>
+                    <td className="tertials-cell">{entry.rows.length}</td>
                     <td className="status-cell">
                       <span className={`status-badge ${getStatusBadgeClass(entry.status)}`}>
                         {entry.status}

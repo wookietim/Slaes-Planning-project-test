@@ -21,6 +21,13 @@ const SalesPlanningForm: React.FC<SalesPlanningFormProps> = ({
     });
   };
 
+  const handleYearChange = (value: string) => {
+    onDataChange({
+      ...data,
+      year: value
+    });
+  };
+
   // Filter rows based on selected HFB filter
   const filteredRows = hfbFilter === 'All' 
     ? data.rows 
@@ -39,7 +46,7 @@ const SalesPlanningForm: React.FC<SalesPlanningFormProps> = ({
   const addNewRow = () => {
     const newRow: SalesDataRow = {
       id: Date.now().toString(),
-      quarter: `Q${data.rows.length + 1}`,
+      tertial: `T${data.rows.length + 1}`,
       hfb: '',
       turnover: '',
       profit: '',
@@ -55,10 +62,10 @@ const SalesPlanningForm: React.FC<SalesPlanningFormProps> = ({
   const removeRow = (rowId: string) => {
     if (data.rows.length > 1) {
       const updatedRows = data.rows.filter(row => row.id !== rowId);
-      // Update quarter labels
+      // Update tertial labels
       const reIndexedRows = updatedRows.map((row, index) => ({
         ...row,
-        quarter: `Q${index + 1}`
+        tertial: `T${index + 1}`
       }));
       onDataChange({
         ...data,
@@ -70,21 +77,40 @@ const SalesPlanningForm: React.FC<SalesPlanningFormProps> = ({
   return (
     <div className="sales-planning-form">
       <div className="form-header">
-        <div className="country-section">
-          <label htmlFor="country">Country</label>
-          <select
-            id="country"
-            value={data.country}
-            onChange={(e) => handleCountryChange(e.target.value)}
-            disabled={isReadOnly}
-            className="country-select"
-          >
-            <option value="">Select a country</option>
-            <option value="USA">USA</option>
-            <option value="Sweden">Sweden</option>
-            <option value="France">France</option>
-            <option value="Mexico">Mexico</option>
-          </select>
+        <div className="header-row">
+          <div className="year-section">
+            <label htmlFor="year">Year</label>
+            <select
+              id="year"
+              value={data.year}
+              onChange={(e) => handleYearChange(e.target.value)}
+              disabled={isReadOnly}
+              className="year-select"
+            >
+              {Array.from({ length: 11 }, (_, i) => 2020 + i).map(year => (
+                <option key={year} value={year.toString()}>
+                  {year}
+                </option>
+              ))}
+            </select>
+          </div>
+          
+          <div className="country-section">
+            <label htmlFor="country">Country</label>
+            <select
+              id="country"
+              value={data.country}
+              onChange={(e) => handleCountryChange(e.target.value)}
+              disabled={isReadOnly}
+              className="country-select"
+            >
+              <option value="">Select a country</option>
+              <option value="USA">USA</option>
+              <option value="Sweden">Sweden</option>
+              <option value="France">France</option>
+              <option value="Mexico">Mexico</option>
+            </select>
+          </div>
         </div>
       </div>
 
@@ -133,7 +159,7 @@ const SalesPlanningForm: React.FC<SalesPlanningFormProps> = ({
 
       <div className="form-grid">
         <div className="grid-headers">
-          <div className="header-cell">Quarter</div>
+          <div className="header-cell">Tertial</div>
           <div className="header-cell">HFB</div>
           <div className="header-cell">Turnover</div>
           <div className="header-cell">Profit</div>
@@ -144,7 +170,18 @@ const SalesPlanningForm: React.FC<SalesPlanningFormProps> = ({
 
         {filteredRows.map((row) => (
           <div key={row.id} className="grid-row">
-            <div className="row-label">{row.quarter}</div>
+            <div className="input-cell">
+              <select
+                value={row.tertial}
+                onChange={(e) => handleRowChange(row.id, 'tertial', e.target.value)}
+                disabled={isReadOnly}
+                className="tertial-select"
+              >
+                <option value="T1">T1</option>
+                <option value="T2">T2</option>
+                <option value="T3">T3</option>
+              </select>
+            </div>
             <div className="input-cell">
               <select
                 value={row.hfb}
@@ -217,7 +254,7 @@ const SalesPlanningForm: React.FC<SalesPlanningFormProps> = ({
             onClick={addNewRow}
             title="Add new row"
           >
-            + Add New Quarter
+            + Add New Tertial
           </button>
         </div>
       )}

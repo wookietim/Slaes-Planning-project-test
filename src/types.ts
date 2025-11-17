@@ -1,7 +1,7 @@
 // Types for the sales planning form
 export interface SalesDataRow {
   id: string;
-  quarter: string;
+  tertial: string;
   hfb: string;
   turnover: string;
   profit: string;
@@ -11,10 +11,11 @@ export interface SalesDataRow {
 
 export interface SalesData {
   country: string;
+  year: string;
   rows: SalesDataRow[];
 }
 
-export type WorkflowStatus = 'draft' | 'review' | 'approved' | 'published';
+export type WorkflowStatus = 'draft' | 'review' | 'approved' | 'published' | 'denied';
 
 export interface SalesPlanEntry extends SalesData {
   id: string;

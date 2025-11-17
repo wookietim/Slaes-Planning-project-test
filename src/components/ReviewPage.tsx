@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { SalesData } from '../types';
 import apiService, { SalesPlan } from '../services/apiService';
@@ -8,15 +8,58 @@ interface LocationState {
   entryId?: string;
 }
 
+interface ReviewableRow {
+  planId: string;
+  rowIndex: number;
+  country: string;
+  year: string;
+  tertial: string;
+  hfb: string;
+  salesGoal: number;
+  actualSales: number;
+  variance: number;
+  status: 'pending' | 'approved' | 'denied' | 'published';
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 const ReviewPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams] = useSearchParams();
-  const [reviewComment, setReviewComment] = useState('');
   const [salesPlans, setSalesPlans] = useState<SalesPlan[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
+  const [rowStatuses, setRowStatuses] = useState<Record<string, 'pending' | 'approved' | 'denied' | 'published'>>({});
+  const [statusesLoaded, setStatusesLoaded] = useState(false);
+
+  // Load row statuses from localStorage on component mount
+  useEffect(() => {
+    const loadRowStatuses = () => {
+      const savedStatuses = localStorage.getItem('reviewRowStatuses');
+      if (savedStatuses) {
+        try {
+          const parsed = JSON.parse(savedStatuses);
+          setRowStatuses(parsed);
+        } catch (error) {
+          console.error('Failed to parse saved row statuses:', error);
+          // Clear corrupted data
+          localStorage.removeItem('reviewRowStatuses');
+        }
+      }
+      setStatusesLoaded(true);
+    };
+
+    loadRowStatuses();
+  }, []);
+
+  // Save row statuses to localStorage whenever they change (but not on initial load)
+  useEffect(() => {
+    if (statusesLoaded) {
+      localStorage.setItem('reviewRowStatuses', JSON.stringify(rowStatuses));
+    }
+  }, [rowStatuses, statusesLoaded]);
 
   useEffect(() => {
     loadSalesPlansForReview();
@@ -51,133 +94,126 @@ const ReviewPage: React.FC = () => {
     }
   };
 
-  // Group sales plans by country
-  const groupedByCountry = salesPlans.reduce((acc, plan) => {
-    if (!acc[plan.country]) {
-      acc[plan.country] = [];
-    }
-    acc[plan.country].push(plan);
-    return acc;
-  }, {} as Record<string, SalesPlan[]>);
-
   const selectedPlan = salesPlans.find(plan => plan.id === selectedPlanId);
   
-  // Convert API format to component format for compatibility
-  const salesData: SalesData = selectedPlan ? {
-    country: selectedPlan.country,
-    rows: selectedPlan.rows.map((row, index) => ({
-      id: `${selectedPlan.id}-${index}`,
-      quarter: row.quarter,
-      hfb: '', // This field isn't stored in the new structure, using empty string
-      turnover: row.salesGoal.toString(),
-      profit: row.actualSales.toString(),
-      qty: '', // This field isn't stored in the new structure, using empty string
-      gm: row.variance.toString()
-    }))
-  } : {
-    country: 'No data',
-    rows: []
-  };
-
-  const handleApprove = async () => {
-    if (!selectedPlan) return;
-    
-    try {
-      await apiService.updateSalesPlan(selectedPlan.id, {
-        country: selectedPlan.country,
-        status: 'approved',
-        rows: selectedPlan.rows
-      });
-      
-      alert(`Data has been approved! ${reviewComment ? `Comment: ${reviewComment}` : ''}`);
-      navigate('/main', { 
-        state: { 
-          status: 'approved', 
-          salesData,
-          reviewComment,
-          entryId: selectedPlan.id
-        } 
-      });
-    } catch (error) {
-      console.error('Failed to approve sales plan:', error);
-      alert('Failed to approve the sales plan. Please try again.');
-    }
-  };
-
-  const handleDisapprove = async () => {
-    const comment = reviewComment.trim();
-    if (!comment) {
-      alert('Please provide a comment explaining why the data is disapproved.');
-      return;
+  // Create flat list of all rows for individual review
+  const createReviewableRows = (): ReviewableRow[] => {
+    // Don't create rows until statuses are loaded to ensure proper filtering
+    if (!statusesLoaded) {
+      return [];
     }
     
-    if (!selectedPlan) return;
+    const allRows: ReviewableRow[] = [];
     
-    try {
-      await apiService.updateSalesPlan(selectedPlan.id, {
-        country: selectedPlan.country,
-        status: 'draft',
-        rows: selectedPlan.rows
+    salesPlans.forEach(plan => {
+      plan.rows.forEach((row, index) => {
+        const rowKey = `${plan.id}-${index}`;
+        const status = rowStatuses[rowKey] || 'pending';
+        
+        // Only include rows that are pending or approved (exclude denied and published)
+        if (status !== 'denied' && status !== 'published') {
+          allRows.push({
+            planId: plan.id,
+            rowIndex: index,
+            country: plan.country,
+            year: plan.year || '2025',
+            tertial: row.tertial || row.quarter || 'T1',
+            hfb: 'General', // Default HFB since it's not stored in current API structure
+            salesGoal: row.salesGoal,
+            actualSales: row.actualSales,
+            variance: row.variance,
+            status: status,
+            createdAt: plan.createdAt,
+            updatedAt: plan.updatedAt
+          });
+        }
       });
-      
-      alert(`Data has been disapproved. Reason: ${comment}`);
-      navigate('/main', { 
-        state: { 
-          status: 'draft', 
-          salesData,
-          reviewComment: comment,
-          entryId: selectedPlan.id
-        } 
-      });
-    } catch (error) {
-      console.error('Failed to disapprove sales plan:', error);
-      alert('Failed to disapprove the sales plan. Please try again.');
-    }
+    });
+
+    // Sort by year, country, HFB, tertial
+    return allRows.sort((a, b) => {
+      if (a.year !== b.year) return a.year.localeCompare(b.year);
+      if (a.country !== b.country) return a.country.localeCompare(b.country);
+      if (a.hfb !== b.hfb) return a.hfb.localeCompare(b.hfb);
+      return a.tertial.localeCompare(b.tertial);
+    });
   };
 
-  const handleApprovePlan = async (plan: SalesPlan) => {
-    try {
-      await apiService.updateSalesPlan(plan.id, {
-        country: plan.country,
-        status: 'approved',
-        rows: plan.rows
-      });
-      
-      alert(`${plan.country} sales plan has been approved! ${reviewComment ? `Comment: ${reviewComment}` : ''}`);
-      loadSalesPlansForReview(); // Reload to update the list
-    } catch (error) {
-      console.error('Failed to approve sales plan:', error);
-      alert('Failed to approve the sales plan. Please try again.');
-    }
-  };
-
-  const handleDisapprovePlan = async (plan: SalesPlan) => {
-    const comment = reviewComment.trim();
-    if (!comment) {
-      alert('Please provide a comment explaining why the data is disapproved.');
-      return;
+  // Calculate statistics for all rows (including approved ones for summary)
+  const allRowsStats = useMemo(() => {
+    // Don't calculate stats until statuses are loaded
+    if (!statusesLoaded) {
+      return { totalRows: 0, approvedCount: 0, deniedCount: 0, pendingCount: 0, publishedCount: 0 };
     }
     
-    try {
-      await apiService.updateSalesPlan(plan.id, {
-        country: plan.country,
-        status: 'draft',
-        rows: plan.rows
+    let totalRows = 0;
+    let approvedCount = 0;
+    let deniedCount = 0;
+    let pendingCount = 0;
+    let publishedCount = 0;
+
+    salesPlans.forEach(plan => {
+      plan.rows.forEach((_, index) => {
+        const rowKey = `${plan.id}-${index}`;
+        const status = rowStatuses[rowKey] || 'pending';
+        totalRows++;
+        
+        if (status === 'approved') approvedCount++;
+        else if (status === 'denied') deniedCount++;
+        else if (status === 'published') publishedCount++;
+        else pendingCount++;
       });
-      
-      alert(`${plan.country} sales plan has been disapproved. Reason: ${comment}`);
-      loadSalesPlansForReview(); // Reload to update the list
-      setReviewComment(''); // Clear the comment
-    } catch (error) {
-      console.error('Failed to disapprove sales plan:', error);
-      alert('Failed to disapprove the sales plan. Please try again.');
-    }
+    });
+
+    return { totalRows, approvedCount, deniedCount, pendingCount, publishedCount };
+  }, [salesPlans, rowStatuses, statusesLoaded]);
+
+  const reviewableRows = useMemo(() => {
+    return createReviewableRows();
+  }, [salesPlans, rowStatuses, statusesLoaded]);
+
+  const handleRowApprove = (rowKey: string) => {
+    setRowStatuses(prev => ({ ...prev, [rowKey]: 'approved' as const }));
+  };
+
+  const handleRowDeny = (rowKey: string) => {
+    setRowStatuses(prev => ({ ...prev, [rowKey]: 'denied' }));
+  };
+
+  const handleRowPublish = (rowKey: string) => {
+    setRowStatuses(prev => ({ ...prev, [rowKey]: 'published' as const }));
+  };
+
+  const handleRowReset = (rowKey: string) => {
+    setRowStatuses(prev => {
+      const updated = { ...prev };
+      delete updated[rowKey];
+      return updated;
+    });
   };
 
   const handleBackToForm = () => {
+    const backSalesData = selectedPlan ? {
+      country: selectedPlan.country,
+      year: selectedPlan.year || '2025',
+      rows: selectedPlan.rows.map((row, index) => ({
+        id: `${selectedPlan.id}-${index}`,
+        tertial: row.tertial || row.quarter || 'T1',
+        hfb: '',
+        turnover: row.salesGoal.toString(),
+        profit: row.actualSales.toString(),
+        qty: '',
+        gm: row.variance.toString()
+      }))
+    } : {
+      country: 'No data',
+      year: '2025',
+      rows: []
+    };
+    
     navigate('/main', { 
       state: { 
-        salesData,
+        salesData: backSalesData,
         entryId: selectedPlanId 
       } 
     });
@@ -232,115 +268,130 @@ const ReviewPage: React.FC = () => {
     <div className="review-page">
       <div className="review-container">
         <header className="review-header">
-          <h1>Sales Planning Review</h1>
+          <h1>Sales Planning Review - Individual Line Review</h1>
           <button className="btn back-btn" onClick={handleBackToForm}>
             ← Back to Form
           </button>
         </header>
 
         <div className="review-content">
-          {salesPlans.length > 1 && (
-            <div className="plan-selector">
-              <label htmlFor="planSelect">Select Plan to Review:</label>
-              <select 
-                id="planSelect"
-                value={selectedPlanId || ''}
-                onChange={(e) => setSelectedPlanId(e.target.value)}
-                className="plan-select"
-              >
-                {salesPlans.map((plan) => (
-                  <option key={plan.id} value={plan.id}>
-                    {plan.country} - {new Date(plan.updatedAt).toLocaleDateString()} 
-                    ({plan.rows.length} quarters)
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
-          
-          <div className="data-summary">
-            <h2>Sales Plans by Country</h2>
-            
-            {Object.entries(groupedByCountry).map(([country, plans]) => (
-              <div key={country} className="country-section">
-                <h3 className="country-header">{country}</h3>
-                
-                {plans.map((plan) => (
-                  <div key={plan.id} className="plan-section">
-                    <div className="plan-info">
-                      <span className="plan-date">
-                        Created: {new Date(plan.createdAt).toLocaleDateString()}
-                      </span>
-                      <span className="plan-updated">
-                        Updated: {new Date(plan.updatedAt).toLocaleDateString()}
-                      </span>
-                      <span className="plan-status">Status: {plan.status}</span>
-                    </div>
-                    
-                    <div className="data-table">
-                      <table>
-                        <thead>
-                          <tr>
-                            <th>Quarter</th>
-                            <th>Sales Goal</th>
-                            <th>Actual Sales</th>
-                            <th>Variance</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {plan.rows.map((row, index) => (
-                            <tr key={`${plan.id}-${index}`}>
-                              <td>{row.quarter}</td>
-                              <td>{row.salesGoal.toLocaleString()}</td>
-                              <td>{row.actualSales.toLocaleString()}</td>
-                              <td className={row.variance >= 0 ? 'positive-variance' : 'negative-variance'}>
-                                {row.variance > 0 ? '+' : ''}{row.variance.toLocaleString()}
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                    
-                    <div className="plan-actions">
-                      <button 
-                        className="btn approve-btn"
-                        onClick={() => handleApprovePlan(plan)}
-                      >
-                        ✓ Approve This Plan
-                      </button>
-                      
-                      <button 
-                        className="btn disapprove-btn"
-                        onClick={() => handleDisapprovePlan(plan)}
-                      >
-                        ✗ Disapprove This Plan
-                      </button>
-                    </div>
+          {reviewableRows.length === 0 ? (
+            <div className="no-data">
+              {allRowsStats.totalRows > 0 ? (
+                <>
+                  <p>🎉 All problematic sales plan lines have been handled!</p>
+                  <div className="completion-summary">
+                    <p><strong>Review Complete:</strong></p>
+                    <p>• Total Lines: {allRowsStats.totalRows}</p>
+                    <p>• Approved: {allRowsStats.approvedCount}</p>
+                    <p>• Denied (removed): {allRowsStats.deniedCount}</p>
+                    <p>• Remaining Pending: {allRowsStats.pendingCount}</p>
                   </div>
-                ))}
+                </>
+              ) : (
+                <p>No sales plan lines are currently pending review.</p>
+              )}
+              <button className="btn primary-btn" onClick={() => navigate('/main')}>
+                Back to Form
+              </button>
+            </div>
+          ) : (
+            <div className="individual-review-section">
+              <h2>Review Each Line Individually</h2>
+              <p>Sorted by Year → Country → HFB → Tertial</p>
+              <div className="review-instructions">
+                <p><strong>Instructions:</strong></p>
+                <p>• ✓ <strong>Approve:</strong> Line will remain visible with "APPROVED" status</p>
+                <p>• ✗ <strong>Deny:</strong> Line will be removed from the table immediately</p>
+                <p>• 📤 <strong>Publish:</strong> Available for approved lines - publishes and removes them from the table</p>
+                <p>• <strong>Reset:</strong> Returns line to "PENDING" status</p>
               </div>
-            ))}
-          </div>
+              
+              <div className="individual-review-table">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Year</th>
+                    <th>Country</th>
+                    <th>HFB</th>
+                    <th>Tertial</th>
+                    <th>Sales Goal</th>
+                    <th>Actual Sales</th>
+                    <th>Variance</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {reviewableRows.map((row) => {
+                    const rowKey = `${row.planId}-${row.rowIndex}`;
+                    return (
+                      <tr key={rowKey} className={`row-${row.status}`}>
+                        <td>{row.year}</td>
+                        <td>{row.country}</td>
+                        <td>{row.hfb}</td>
+                        <td>{row.tertial}</td>
+                        <td>{row.salesGoal.toLocaleString()}</td>
+                        <td>{row.actualSales.toLocaleString()}</td>
+                        <td className={row.variance >= 0 ? 'positive-variance' : 'negative-variance'}>
+                          {row.variance > 0 ? '+' : ''}{row.variance.toLocaleString()}
+                        </td>
+                        <td>
+                          <span className={`row-status-badge ${row.status}`}>
+                            {row.status.toUpperCase()}
+                          </span>
+                        </td>
+                        <td className="action-buttons">
+                          <button
+                            className="btn approve-row-btn"
+                            onClick={() => handleRowApprove(rowKey)}
+                            disabled={row.status === 'approved' || row.status === 'published'}
+                          >
+                            ✓
+                          </button>
+                          <button
+                            className="btn deny-row-btn"
+                            onClick={() => handleRowDeny(rowKey)}
+                            disabled={row.status === 'denied'}
+                          >
+                            ✗
+                          </button>
+                          {row.status === 'approved' && (
+                            <button
+                              className="btn publish-row-btn"
+                              onClick={() => handleRowPublish(rowKey)}
+                              title="Publish this approved line"
+                            >
+                              📤 Publish
+                            </button>
+                          )}
+                          <button
+                            className="btn reset-row-btn"
+                            onClick={() => handleRowReset(rowKey)}
+                            disabled={row.status === 'pending'}
+                          >
+                            Reset
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
 
-          <div className="review-section">
-            <h2>General Review Comments</h2>
-            <p>Use the comments below when approving or disapproving individual plans above.</p>
-            
-            <div className="comment-section">
-              <label htmlFor="reviewComment">
-                Review Comments (required for disapproval):
-              </label>
-              <textarea
-                id="reviewComment"
-                value={reviewComment}
-                onChange={(e) => setReviewComment(e.target.value)}
-                placeholder="Enter your review comments here..."
-                rows={4}
-                className="review-textarea"
-              />
+            <div className="review-summary">
+              <div className="summary-stats">
+                <span>Total Lines: {allRowsStats.totalRows}</span>
+                <span>Approved: {allRowsStats.approvedCount}</span>
+                <span>Published: {allRowsStats.publishedCount}</span>
+                <span>Denied (removed): {allRowsStats.deniedCount}</span>
+                <span>Pending: {allRowsStats.pendingCount}</span>
+                <span>Remaining to Review: {reviewableRows.length}</span>
+              </div>
             </div>
           </div>
+          )}
         </div>
       </div>
     </div>

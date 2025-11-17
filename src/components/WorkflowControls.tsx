@@ -78,6 +78,8 @@ IKEA Sales Planning System`;
         return 'Approved';
       case 'published':
         return 'Published';
+      case 'denied':
+        return 'Denied';
       default:
         return 'Draft';
     }
@@ -127,24 +129,13 @@ IKEA Sales Planning System`;
             versioning
           </button>
         )}
-      </div>
 
-      <div className="workflow-diagram">
-        <div className={`workflow-step ${currentStatus === 'review' ? 'active' : currentStatus === 'approved' || currentStatus === 'published' ? 'completed' : ''}`}>
-          <div className="step-label">Send for review, assign reviewer</div>
-        </div>
-        
-        <div className="workflow-arrow">→</div>
-        
-        <div className={`workflow-step ${currentStatus === 'approved' ? 'active' : currentStatus === 'published' ? 'completed' : ''}`}>
-          <div className="step-label">Approved</div>
-        </div>
-        
-        <div className="workflow-arrow">→</div>
-        
-        <div className={`workflow-step ${currentStatus === 'published' ? 'active' : ''}`}>
-          <div className="step-label">Publish</div>
-        </div>
+        {currentStatus === 'denied' && (
+          <div className="denied-message">
+            <span className="denied-status">Plan Denied</span>
+            <p>This plan has been denied and is available for editing.</p>
+          </div>
+        )}
       </div>
     </div>
   );

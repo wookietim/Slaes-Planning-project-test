@@ -1,5 +1,7 @@
 export interface SalesPlanRow {
-  quarter: string;
+  tertial?: string;
+  quarter?: string; // Legacy field for backwards compatibility
+  hfb?: string; // HFB field
   salesGoal: number;
   actualSales: number;
   variance: number;
@@ -8,7 +10,9 @@ export interface SalesPlanRow {
 export interface SalesPlan {
   id: string;
   country: string;
+  year: string;
   status: string;
+  user?: string; // User email who created the plan
   rows: SalesPlanRow[];
   createdAt: Date;
   updatedAt: Date;
@@ -16,13 +20,17 @@ export interface SalesPlan {
 
 export interface CreateSalesPlanRequest {
   country: string;
+  year: string;
   status: string;
+  user?: string; // User email who created the plan
   rows: SalesPlanRow[];
 }
 
 export interface UpdateSalesPlanRequest {
   country: string;
+  year: string;
   status: string;
+  user?: string; // User email who created the plan
   rows: SalesPlanRow[];
 }
 

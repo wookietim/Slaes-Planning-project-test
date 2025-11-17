@@ -8,6 +8,8 @@ const LoginPage: React.FC = () => {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
+    // Store the logged-in user's email
+    localStorage.setItem('currentUser', email);
     // No validation required - accept any email and password
     navigate('/main');
   };
