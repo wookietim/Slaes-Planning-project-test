@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useLocation, useSearchParams } from 'react-router-dom';
+import { useLocation, useSearchParams, useNavigate } from 'react-router-dom';
 import { SalesData } from '../types';
 import apiService, { SalesPlan } from '../services/apiService';
 
@@ -26,11 +26,17 @@ interface ReviewableRow {
 const ReviewPage: React.FC = () => {
   const location = useLocation();
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   
   // Check if current user has reviewer role
-  const checkUserRole = (role: 'inputUser' | 'reviewer'): boolean => {
+  const checkUserRole = (role: 'inputUser' | 'reviewer' | 'admin'): boolean => {
     const currentUser = localStorage.getItem('currentUser');
     if (!currentUser) return false;
+    
+    // Special case for timothy.collins - grant all roles
+    if (currentUser === 'timothy.collins@ingka.ikea.com') {
+      return true;
+    }
     
     const userRoles = localStorage.getItem('userRoles');
     if (!userRoles) return false;
@@ -45,6 +51,8 @@ const ReviewPage: React.FC = () => {
   };
 
   const isReviewer = checkUserRole('reviewer');
+  const isInputUser = checkUserRole('inputUser');
+  const isAdmin = checkUserRole('admin');
   
   // Redirect non-reviewers to main page
   if (!isReviewer) {
@@ -261,20 +269,33 @@ const ReviewPage: React.FC = () => {
           {/* Tab Navigation */}
           <nav className="app-tabs">
             <div className="tab-container">
-              <a href="/main" className="tab">
-                📋 Main
-              </a>
+              {isInputUser && (
+                <button 
+                  className="tab"
+                  onClick={() => navigate('/main')}
+                >
+                  📋 Main
+                </button>
+              )}
               {isReviewer && (
                 <button className="tab active">
                   📝 Review
                 </button>
               )}
-              <a href="/published" className="tab">
+              <button 
+                className="tab"
+                onClick={() => navigate('/published')}
+              >
                 📊 Published
-              </a>
-              <a href="/admin" className="tab">
-                🔧 Admin
-              </a>
+              </button>
+              {isAdmin && (
+                <button 
+                  className="tab"
+                  onClick={() => navigate('/admin')}
+                >
+                  🔧 Admin
+                </button>
+              )}
             </div>
             
             <div className="app-actions">

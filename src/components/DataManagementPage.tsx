@@ -21,6 +21,7 @@ const DataManagementPage: React.FC = () => {
   };
 
   const isReviewer = checkUserRole('reviewer');
+  const isInputUser = checkUserRole('inputUser');
   
   const [entries, setEntries] = useState<SalesPlan[]>([]);
   const [loading, setLoading] = useState(true);
@@ -130,20 +131,34 @@ const DataManagementPage: React.FC = () => {
           {/* Tab Navigation */}
           <nav className="app-tabs">
             <div className="tab-container">
-              <a href="/main" className="tab">
-                📋 Main
-              </a>
-              {isReviewer && (
-                <a href="/review" className="tab">
-                  📝 Review
-                </a>
+              {isInputUser && (
+                <button 
+                  className="tab"
+                  onClick={() => navigate('/main')}
+                >
+                  📋 Main
+                </button>
               )}
-              <a href="/published" className="tab">
+              {isReviewer && (
+                <button 
+                  className="tab"
+                  onClick={() => navigate('/review')}
+                >
+                  📝 Review
+                </button>
+              )}
+              <button 
+                className="tab"
+                onClick={() => navigate('/published')}
+              >
                 📊 Published
-              </a>
-              <a href="/admin" className="tab">
+              </button>
+              <button 
+                className="tab"
+                onClick={() => navigate('/admin')}
+              >
                 🔧 Admin
-              </a>
+              </button>
             </div>
             
             <div className="app-actions">

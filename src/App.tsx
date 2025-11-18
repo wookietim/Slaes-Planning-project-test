@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation, Navigate, useNavigate } from 'react-router-dom';
 import { SalesData, WorkflowStatus } from './types';
 import apiService, { SalesPlan } from './services/apiService';
 import SalesPlanningForm from './components/SalesPlanningForm.tsx';
@@ -11,13 +11,92 @@ import DataManagementPage from './components/DataManagementPage.tsx';
 import AdminPage from './AdminPage.tsx';
 import './App.css';
 
+// Route protection component
+const ProtectedRoute: React.FC<{
+  children: React.ReactNode;
+  requiredRole?: 'inputUser' | 'reviewer' | 'admin';
+  allowAny?: boolean;
+}> = ({ children, requiredRole, allowAny }) => {
+  const currentUser = localStorage.getItem('currentUser');
+  console.log('ProtectedRoute - currentUser:', currentUser, 'requiredRole:', requiredRole);
+  
+  if (!currentUser) {
+    console.log('No current user - redirecting to login');
+    return <Navigate to="/" replace />;
+  }
+
+  if (allowAny) {
+    console.log('Allow any - granting access');
+    return <>{children}</>;
+  }
+
+  const checkUserRole = (role: 'inputUser' | 'reviewer' | 'admin'): boolean => {
+    const userRoles = localStorage.getItem('userRoles');
+    
+    // Special case for timothy.collins - allow admin access even without initialized roles
+    if (!userRoles && currentUser === 'timothy.collins@ingka.ikea.com' && role === 'admin') {
+      console.log('Timothy Collins special case - granting admin access');
+      return true;
+    }
+    
+    if (!userRoles) {
+      console.log('No user roles found');
+      return false;
+    }
+    
+    try {
+      const roles = JSON.parse(userRoles);
+      const hasRole = roles[currentUser]?.[role] || false;
+      console.log(`User ${currentUser} has role ${role}:`, hasRole);
+      return hasRole;
+    } catch (error) {
+      console.error('Failed to parse user roles:', error);
+      return false;
+    }
+  };
+
+  if (requiredRole && !checkUserRole(requiredRole)) {
+    console.log('User does not have required role, checking alternatives...');
+    // Redirect to appropriate page based on their actual role
+    const isInputUser = checkUserRole('inputUser');
+    const isReviewer = checkUserRole('reviewer');
+    const isAdmin = checkUserRole('admin');
+    
+    console.log('User roles check:', { isInputUser, isReviewer, isAdmin });
+    
+    if (isAdmin) {
+      return <Navigate to="/admin" replace />;
+    } else if (isInputUser) {
+      return <Navigate to="/main" replace />;
+    } else if (isReviewer) {
+      return <Navigate to="/review" replace />;
+    } else {
+      return <Navigate to="/published" replace />;
+    }
+  }
+
+  console.log('Access granted to protected route');
+  return <>{children}</>;
+};
+
 const MainPage: React.FC = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   
   // Check if current user has reviewer role
-  const checkUserRole = (role: 'inputUser' | 'reviewer'): boolean => {
+  const checkUserRole = (role: 'inputUser' | 'reviewer' | 'admin'): boolean => {
     const currentUser = localStorage.getItem('currentUser');
     if (!currentUser) return false;
+    
+    // Special case for timothy.collins - always grant admin access
+    if (currentUser === 'timothy.collins@ingka.ikea.com' && role === 'admin') {
+      return true;
+    }
+    
+    // Special case for timothy.collins - grant all roles
+    if (currentUser === 'timothy.collins@ingka.ikea.com') {
+      return true;
+    }
     
     const userRoles = localStorage.getItem('userRoles');
     if (!userRoles) return false;
@@ -32,6 +111,8 @@ const MainPage: React.FC = () => {
   };
 
   const isReviewer = checkUserRole('reviewer');
+  const isInputUser = checkUserRole('inputUser');
+  const isAdmin = checkUserRole('admin');
   
   const [salesData, setSalesData] = useState<SalesData>({
     country: '',
@@ -579,20 +660,33 @@ const MainPage: React.FC = () => {
         {/* Tab Navigation */}
         <nav className="app-tabs">
           <div className="tab-container">
-            <button className="tab active">
-              📋 Main
-            </button>
-            {isReviewer && (
-              <a href="/review" className="tab">
-                � Review
-              </a>
+            {isInputUser && (
+              <button className="tab active">
+                📋 Main
+              </button>
             )}
-            <a href="/published" className="tab">
+            {isReviewer && (
+              <button 
+                className="tab"
+                onClick={() => navigate('/review')}
+              >
+                📝 Review
+              </button>
+            )}
+            <button 
+              className="tab"
+              onClick={() => navigate('/published')}
+            >
               📊 Published
-            </a>
-            <a href="/admin" className="tab">
-              🔧 Admin
-            </a>
+            </button>
+            {isAdmin && (
+              <button 
+                className="tab"
+                onClick={() => navigate('/admin')}
+              >
+                🔧 Admin
+              </button>
+            )}
           </div>
           
           {/* Action buttons moved to a separate section */}
@@ -909,11 +1003,46 @@ const App: React.FC = () => {
     <Router>
       <Routes>
         <Route path="/" element={<LoginPage />} />
-        <Route path="/main" element={<MainPage />} />
-        <Route path="/review" element={<ReviewPage />} />
-        <Route path="/published" element={<PublishedPage />} />
-        <Route path="/data" element={<DataManagementPage />} />
-        <Route path="/admin" element={<AdminPage />} />
+        <Route 
+          path="/main" 
+          element={
+            <ProtectedRoute requiredRole="inputUser">
+              <MainPage />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/review" 
+          element={
+            <ProtectedRoute requiredRole="reviewer">
+              <ReviewPage />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/published" 
+          element={
+            <ProtectedRoute allowAny>
+              <PublishedPage />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/data" 
+          element={
+            <ProtectedRoute requiredRole="inputUser">
+              <DataManagementPage />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/admin" 
+          element={
+            <ProtectedRoute requiredRole="admin">
+              <AdminPage />
+            </ProtectedRoute>
+          } 
+        />
       </Routes>
     </Router>
   );

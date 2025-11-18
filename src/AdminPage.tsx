@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 interface UserRoles {
   inputUser: boolean;
   reviewer: boolean;
+  admin: boolean;
 }
 
 interface UsersData {
@@ -10,12 +12,34 @@ interface UsersData {
 }
 
 const AdminPage: React.FC = () => {
+  const navigate = useNavigate();
+  
+  const predefinedUsers = [
+    'timothy.collins@ingka.ikea.com',
+    'bschilke@ingka.ikea.com'
+  ];
+
   // Check if current user has reviewer role
-  const checkUserRole = (role: 'inputUser' | 'reviewer'): boolean => {
+  const checkUserRole = (role: 'inputUser' | 'reviewer' | 'admin'): boolean => {
     const currentUser = localStorage.getItem('currentUser');
     if (!currentUser) return false;
     
     const userRoles = localStorage.getItem('userRoles');
+    
+    // If no userRoles exist and this is timothy.collins, auto-initialize as admin
+    if (!userRoles && currentUser === 'timothy.collins@ingka.ikea.com') {
+      const defaultUsers: UsersData = {};
+      predefinedUsers.forEach(email => {
+        defaultUsers[email] = {
+          inputUser: true,
+          reviewer: true,
+          admin: email === 'timothy.collins@ingka.ikea.com'
+        };
+      });
+      localStorage.setItem('userRoles', JSON.stringify(defaultUsers));
+      return role === 'admin' || role === 'inputUser' || role === 'reviewer'; // timothy.collins has all roles
+    }
+    
     if (!userRoles) return false;
     
     try {
@@ -28,6 +52,29 @@ const AdminPage: React.FC = () => {
   };
 
   const isReviewer = checkUserRole('reviewer');
+  const isInputUser = checkUserRole('inputUser');
+  const isAdmin = checkUserRole('admin');
+
+  // Redirect non-admin users - but allow timothy.collins through
+  useEffect(() => {
+    const currentUser = localStorage.getItem('currentUser');
+    console.log('AdminPage useEffect - currentUser:', currentUser);
+    console.log('AdminPage useEffect - isAdmin:', isAdmin);
+    
+    // Always allow timothy.collins access to admin page
+    if (currentUser === 'timothy.collins@ingka.ikea.com') {
+      console.log('Timothy Collins detected in AdminPage - allowing access');
+      return; // Allow access
+    }
+    
+    // For other users, check admin role
+    if (!isAdmin) {
+      console.log('Non-admin user detected - redirecting to published');
+      alert('Access denied. Only admin users can access the admin page.');
+      navigate('/published');
+      return;
+    }
+  }, [isAdmin]);
   
   const [users, setUsers] = useState<UsersData>({});
   const [currentUser, setCurrentUser] = useState<string>('');
@@ -36,15 +83,21 @@ const AdminPage: React.FC = () => {
   const [newUserEmail, setNewUserEmail] = useState<string>('');
   const [newUserRoles, setNewUserRoles] = useState<UserRoles>({
     inputUser: true,
-    reviewer: false
+    reviewer: false,
+    admin: false
   });
   const [showAddForm, setShowAddForm] = useState<boolean>(false);
   const [emailError, setEmailError] = useState<string>('');
 
-  const predefinedUsers = [
-    'timothy.collins@ingka.ikea.com',
-    'bschilke@ingka.ikea.com'
-  ];
+  // Edit user state
+  const [editingUser, setEditingUser] = useState<string | null>(null);
+  const [editingEmail, setEditingEmail] = useState<string>('');
+  const [editEmailError, setEditEmailError] = useState<string>('');
+  const [editingRoles, setEditingRoles] = useState<UserRoles>({
+    inputUser: false,
+    reviewer: false,
+    admin: false
+  });
 
   useEffect(() => {
     // Load current user
@@ -74,7 +127,8 @@ const AdminPage: React.FC = () => {
     predefinedUsers.forEach(email => {
       defaultUsers[email] = {
         inputUser: true,
-        reviewer: true
+        reviewer: true,
+        admin: email === 'timothy.collins@ingka.ikea.com' // Only timothy.collins is admin
       };
     });
     setUsers(defaultUsers);
@@ -126,7 +180,8 @@ const AdminPage: React.FC = () => {
       ...users,
       [newUserEmail]: {
         inputUser: newUserRoles.inputUser,
-        reviewer: newUserRoles.reviewer
+        reviewer: newUserRoles.reviewer,
+        admin: newUserRoles.admin
       }
     };
 
@@ -135,11 +190,86 @@ const AdminPage: React.FC = () => {
     
     // Reset form
     setNewUserEmail('');
-    setNewUserRoles({ inputUser: true, reviewer: false });
+    setNewUserRoles({ inputUser: true, reviewer: false, admin: false });
     setEmailError('');
     setShowAddForm(false);
     
     alert(`User ${newUserEmail} has been added successfully!`);
+  };
+
+  // Edit user functions
+  const handleEditUser = (email: string) => {
+    setEditingUser(email);
+    setEditingEmail(email);
+    setEditingRoles({
+      inputUser: users[email]?.inputUser || false,
+      reviewer: users[email]?.reviewer || false,
+      admin: users[email]?.admin || false
+    });
+    setEditEmailError('');
+  };
+
+  const handleCancelEdit = () => {
+    setEditingUser(null);
+    setEditingEmail('');
+    setEditEmailError('');
+    setEditingRoles({ inputUser: false, reviewer: false, admin: false });
+  };
+
+  const handleSaveEdit = () => {
+    // Validate email if it was changed
+    if (editingEmail !== editingUser) {
+      const error = validateEmail(editingEmail);
+      if (error) {
+        setEditEmailError(error);
+        return;
+      }
+    }
+
+    const updatedUsers = { ...users };
+    
+    // If email was changed, remove old entry and add new one
+    if (editingEmail !== editingUser && editingUser) {
+      delete updatedUsers[editingUser];
+    }
+    
+    // Add/update user with new email and roles
+    updatedUsers[editingEmail] = {
+      inputUser: editingRoles.inputUser,
+      reviewer: editingRoles.reviewer,
+      admin: editingRoles.admin
+    };
+
+    setUsers(updatedUsers);
+    localStorage.setItem('userRoles', JSON.stringify(updatedUsers));
+    
+    // Reset edit state
+    handleCancelEdit();
+    
+    alert(`User ${editingEmail} has been updated successfully!`);
+  };
+
+  const handleEditRoleChange = (role: keyof UserRoles, checked: boolean) => {
+    setEditingRoles(prev => ({
+      ...prev,
+      [role]: checked
+    }));
+  };
+
+  const handleDeleteUser = (email: string) => {
+    if (window.confirm(`Are you sure you want to delete user ${email}? This action cannot be undone.`)) {
+      const updatedUsers = { ...users };
+      delete updatedUsers[email];
+      setUsers(updatedUsers);
+      localStorage.setItem('userRoles', JSON.stringify(updatedUsers));
+      alert(`User ${email} has been deleted successfully!`);
+      
+      // If user deleted themselves, redirect to login
+      if (email === currentUser) {
+        localStorage.removeItem('currentUser');
+        window.location.href = '/';
+      }
+    }
   };
 
   // Get all user emails (predefined + added)
@@ -153,20 +283,33 @@ const AdminPage: React.FC = () => {
         {/* Tab Navigation */}
         <nav className="app-tabs">
           <div className="tab-container">
-            <a href="/main" className="tab">
-              📋 Main
-            </a>
-            {isReviewer && (
-              <a href="/review" className="tab">
-                📝 Review
-              </a>
+            {isInputUser && (
+              <button 
+                className="tab"
+                onClick={() => navigate('/main')}
+              >
+                📋 Main
+              </button>
             )}
-            <a href="/published" className="tab">
+            {isReviewer && (
+              <button 
+                className="tab"
+                onClick={() => navigate('/review')}
+              >
+                📝 Review
+              </button>
+            )}
+            <button 
+              className="tab"
+              onClick={() => navigate('/published')}
+            >
               📊 Published
-            </a>
-            <button className="tab active">
-              🔧 Admin
             </button>
+            {isAdmin && (
+              <button className="tab active">
+                🔧 Admin
+              </button>
+            )}
           </div>
           
           <div className="app-actions">
@@ -195,19 +338,48 @@ const AdminPage: React.FC = () => {
                   <th>User Email</th>
                   <th>Input User</th>
                   <th>Reviewer</th>
+                  <th>Admin</th>
                   <th>Status</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {allUserEmails.map(email => (
                   <tr key={email}>
-                    <td className="user-email">{email}</td>
+                    <td className="user-email">
+                      {editingUser === email ? (
+                        <input
+                          type="email"
+                          value={editingEmail}
+                          onChange={(e) => {
+                            setEditingEmail(e.target.value);
+                            if (editEmailError) setEditEmailError('');
+                          }}
+                          className={editEmailError ? 'error' : ''}
+                          style={{ width: '200px', padding: '4px' }}
+                        />
+                      ) : (
+                        email
+                      )}
+                      {editingUser === email && editEmailError && (
+                        <div style={{ color: 'red', fontSize: '12px', marginTop: '2px' }}>
+                          {editEmailError}
+                        </div>
+                      )}
+                    </td>
                     <td className="role-checkbox">
                       <label>
                         <input
                           type="checkbox"
-                          checked={users[email]?.inputUser || false}
-                          onChange={(e) => handleRoleChange(email, 'inputUser', e.target.checked)}
+                          checked={editingUser === email ? editingRoles.inputUser : (users[email]?.inputUser || false)}
+                          onChange={(e) => {
+                            if (editingUser === email) {
+                              handleEditRoleChange('inputUser', e.target.checked);
+                            } else {
+                              handleRoleChange(email, 'inputUser', e.target.checked);
+                            }
+                          }}
+                          disabled={editingUser !== null && editingUser !== email}
                         />
                         <span className="checkmark">✓</span>
                       </label>
@@ -216,21 +388,97 @@ const AdminPage: React.FC = () => {
                       <label>
                         <input
                           type="checkbox"
-                          checked={users[email]?.reviewer || false}
-                          onChange={(e) => handleRoleChange(email, 'reviewer', e.target.checked)}
+                          checked={editingUser === email ? editingRoles.reviewer : (users[email]?.reviewer || false)}
+                          onChange={(e) => {
+                            if (editingUser === email) {
+                              handleEditRoleChange('reviewer', e.target.checked);
+                            } else {
+                              handleRoleChange(email, 'reviewer', e.target.checked);
+                            }
+                          }}
+                          disabled={editingUser !== null && editingUser !== email}
+                        />
+                        <span className="checkmark">✓</span>
+                      </label>
+                    </td>
+                    <td className="role-checkbox">
+                      <label>
+                        <input
+                          type="checkbox"
+                          checked={editingUser === email ? editingRoles.admin : (users[email]?.admin || false)}
+                          onChange={(e) => {
+                            if (editingUser === email) {
+                              handleEditRoleChange('admin', e.target.checked);
+                            } else {
+                              handleRoleChange(email, 'admin', e.target.checked);
+                            }
+                          }}
+                          disabled={editingUser !== null && editingUser !== email}
                         />
                         <span className="checkmark">✓</span>
                       </label>
                     </td>
                     <td className="user-status">
-                      {users[email]?.inputUser && users[email]?.reviewer ? (
-                        <span className="status-both">Input User & Reviewer</span>
-                      ) : users[email]?.inputUser ? (
-                        <span className="status-input">Input User Only</span>
-                      ) : users[email]?.reviewer ? (
-                        <span className="status-reviewer">Reviewer Only</span>
+                      {(() => {
+                        const userRoles = editingUser === email ? editingRoles : users[email];
+                        const roles = [];
+                        if (userRoles?.admin) roles.push('Admin');
+                        if (userRoles?.inputUser) roles.push('Input User');
+                        if (userRoles?.reviewer) roles.push('Reviewer');
+                        
+                        if (roles.length === 0) {
+                          return <span className="status-none">No Permissions</span>;
+                        }
+                        
+                        const roleText = roles.join(' & ');
+                        if (userRoles?.admin) {
+                          return <span className="status-admin">{roleText}</span>;
+                        } else if (userRoles?.inputUser && userRoles?.reviewer) {
+                          return <span className="status-both">{roleText}</span>;
+                        } else if (userRoles?.inputUser) {
+                          return <span className="status-input">{roleText}</span>;
+                        } else if (userRoles?.reviewer) {
+                          return <span className="status-reviewer">{roleText}</span>;
+                        }
+                      })()}
+                    </td>
+                    <td className="user-actions">
+                      {editingUser === email ? (
+                        <div style={{ display: 'flex', gap: '5px' }}>
+                          <button
+                            onClick={handleSaveEdit}
+                            className="btn small-btn edit-btn"
+                            title="Save changes"
+                          >
+                            💾 Save
+                          </button>
+                          <button
+                            onClick={handleCancelEdit}
+                            className="btn small-btn cancel-btn"
+                            title="Cancel editing"
+                          >
+                            ❌ Cancel
+                          </button>
+                        </div>
                       ) : (
-                        <span className="status-none">No Permissions</span>
+                        <div style={{ display: 'flex', gap: '5px' }}>
+                          <button
+                            onClick={() => handleEditUser(email)}
+                            className="btn small-btn edit-btn"
+                            disabled={editingUser !== null}
+                            title="Edit user"
+                          >
+                            ✏️ Edit
+                          </button>
+                          <button
+                            onClick={() => handleDeleteUser(email)}
+                            className="btn small-btn delete-btn"
+                            disabled={editingUser !== null}
+                            title="Delete user"
+                          >
+                            🗑️ Delete
+                          </button>
+                        </div>
                       )}
                     </td>
                   </tr>
@@ -301,6 +549,14 @@ const AdminPage: React.FC = () => {
                       />
                       <span>Reviewer</span>
                     </label>
+                    <label className="role-checkbox-label">
+                      <input
+                        type="checkbox"
+                        checked={newUserRoles.admin}
+                        onChange={(e) => handleNewUserRoleChange('admin', e.target.checked)}
+                      />
+                      <span>Admin</span>
+                    </label>
                   </div>
                 </div>
               </div>
@@ -317,7 +573,7 @@ const AdminPage: React.FC = () => {
                   onClick={() => {
                     setShowAddForm(false);
                     setNewUserEmail('');
-                    setNewUserRoles({ inputUser: true, reviewer: false });
+                    setNewUserRoles({ inputUser: true, reviewer: false, admin: false });
                     setEmailError('');
                   }}
                   className="cancel-button"
@@ -339,6 +595,10 @@ const AdminPage: React.FC = () => {
             <div className="role-item">
               <h4>🔍 Reviewer</h4>
               <p>Can review submitted plans, approve/deny individual rows, and publish approved plans.</p>
+            </div>
+            <div className="role-item">
+              <h4>🔧 Admin</h4>
+              <p>Can manage user roles and permissions. Has access to the admin panel to add, edit, and delete users.</p>
             </div>
           </div>
         </div>

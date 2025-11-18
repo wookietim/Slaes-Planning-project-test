@@ -2602,6 +2602,15 @@
   font-weight: 500;
 }
 
+.status-admin {
+  background: #6f42c1;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
 .status-none {
   background: #6c757d;
   color: white;
@@ -2942,5 +2951,183 @@
   .cancel-button {
     width: 100%;
     justify-content: center;
+  }
+}
+
+/* User Editing Styles */
+.user-edit-input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 2px solid #0058a3;
+  border-radius: 4px;
+  font-size: 14px;
+  font-family: monospace;
+  background-color: white;
+  transition: all 0.2s ease;
+}
+
+.user-edit-input:focus {
+  outline: none;
+  border-color: #004080;
+  box-shadow: 0 0 0 3px rgba(0, 88, 163, 0.1);
+}
+
+.user-edit-input.error {
+  border-color: #dc3545;
+  background-color: #fff5f5;
+}
+
+.edit-error-message {
+  color: #dc3545;
+  font-size: 12px;
+  margin-top: 4px;
+  font-weight: 500;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+}
+
+.edit-btn {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 50px;
+}
+
+.edit-btn:hover {
+  background: #0056b3;
+  transform: translateY(-1px);
+}
+
+.save-btn {
+  background: #28a745;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 50px;
+}
+
+.save-btn:hover:not(:disabled) {
+  background: #218838;
+  transform: translateY(-1px);
+}
+
+.save-btn:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.cancel-btn {
+  background: #6c757d;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 50px;
+}
+
+.cancel-btn:hover {
+  background: #5a6268;
+  transform: translateY(-1px);
+}
+
+.delete-btn {
+  background: #dc3545;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 60px;
+}
+
+.delete-btn:hover:not(:disabled) {
+  background: #c82333;
+  transform: translateY(-1px);
+}
+
+.delete-btn:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+  transform: none;
+  opacity: 0.6;
+}
+
+.editing-row {
+  background-color: #fff9c4 !important;
+  box-shadow: inset 0 0 0 2px rgba(255, 193, 7, 0.3);
+}
+
+.user-actions {
+  text-align: center;
+  white-space: nowrap;
+}
+
+.edit-role-checkbox {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.edit-role-checkbox input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  cursor: pointer;
+  accent-color: #0058a3;
+}
+
+/* Responsive styles for user editing */
+@media (max-width: 768px) {
+  .action-buttons {
+    flex-direction: column;
+    gap: 4px;
+  }
+  
+  .edit-btn,
+  .save-btn,
+  .cancel-btn,
+  .delete-btn {
+    width: 100%;
+    min-width: auto;
+    font-size: 11px;
+    padding: 6px 8px;
+  }
+  
+  .user-edit-input {
+    font-size: 12px;
+    padding: 6px 8px;
+  }
+  
+  .edit-error-message {
+    font-size: 11px;
+  }
+  
+  .users-table td {
+    padding: 10px 8px;
   }
 }
