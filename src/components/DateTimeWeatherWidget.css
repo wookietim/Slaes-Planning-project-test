@@ -1,0 +1,133 @@
+.datetime-weather-widget {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 16px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  min-width: 280px;
+  z-index: 1000;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.date-section {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  padding-bottom: 12px;
+  margin-bottom: 12px;
+}
+
+.current-date {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 4px;
+  opacity: 0.9;
+}
+
+.current-time {
+  font-size: 18px;
+  font-weight: 700;
+  font-family: 'Courier New', monospace;
+}
+
+.weather-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.weather-loading,
+.weather-error {
+  font-size: 12px;
+  opacity: 0.8;
+  font-style: italic;
+}
+
+.weather-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.weather-icon {
+  font-size: 28px;
+  line-height: 1;
+}
+
+.weather-details {
+  flex: 1;
+}
+
+.temperature {
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.description {
+  font-size: 12px;
+  opacity: 0.8;
+  text-transform: capitalize;
+  line-height: 1.2;
+}
+
+.location {
+  font-size: 10px;
+  opacity: 0.7;
+  margin-top: 2px;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+  line-height: 1.2;
+}
+
+.location:hover {
+  opacity: 1;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .datetime-weather-widget {
+    top: 10px;
+    right: 10px;
+    min-width: 240px;
+    padding: 12px;
+  }
+  
+  .current-date {
+    font-size: 12px;
+  }
+  
+  .current-time {
+    font-size: 16px;
+  }
+  
+  .weather-icon {
+    font-size: 24px;
+  }
+  
+  .temperature {
+    font-size: 14px;
+  }
+}
+
+/* Hover effect */
+.datetime-weather-widget:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Ensure widget doesn't interfere with scrolling */
+body {
+  padding-top: 0;
+  margin-top: 0;
+}
+
+/* Make sure widget stays visible but doesn't block important UI elements */
+@media print {
+  .datetime-weather-widget {
+    display: none;
+  }
+}

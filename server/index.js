@@ -101,6 +101,32 @@ app.get('/api/sales-plans', (req, res) => {
   });
 });
 
+// Get sales plans by status (MUST be before /:id route)
+app.get('/api/sales-plans/status/:status', (req, res) => {
+  const sql = 'SELECT * FROM sales_plans WHERE status = ? ORDER BY updated_at DESC';
+  
+  db.all(sql, [req.params.status], (err, rows) => {
+    if (err) {
+      console.error('Error fetching sales plans by status:', err.message);
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    
+    const salesPlans = rows.map(row => ({
+      id: row.id,
+      country: row.country,
+      year: row.year || '2025',
+      status: row.status,
+      rows: JSON.parse(row.rows),
+      user: row.user_email,
+      createdAt: new Date(row.created_at),
+      updatedAt: new Date(row.updated_at)
+    }));
+    
+    res.json(salesPlans);
+  });
+});
+
 // Get a specific sales plan by ID
 app.get('/api/sales-plans/:id', (req, res) => {
   const sql = 'SELECT * FROM sales_plans WHERE id = ?';
@@ -196,31 +222,6 @@ app.delete('/api/sales-plans/:id', (req, res) => {
     }
     
     res.json({ message: 'Sales plan deleted successfully' });
-  });
-});
-
-// Get sales plans by status
-app.get('/api/sales-plans/status/:status', (req, res) => {
-  const sql = 'SELECT * FROM sales_plans WHERE status = ? ORDER BY updated_at DESC';
-  
-  db.all(sql, [req.params.status], (err, rows) => {
-    if (err) {
-      console.error('Error fetching sales plans by status:', err.message);
-      res.status(500).json({ error: err.message });
-      return;
-    }
-    
-    const salesPlans = rows.map(row => ({
-      id: row.id,
-      country: row.country,
-      year: row.year || '2025',
-      status: row.status,
-      rows: JSON.parse(row.rows),
-      createdAt: new Date(row.created_at),
-      updatedAt: new Date(row.updated_at)
-    }));
-    
-    res.json(salesPlans);
   });
 });
 

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import DateTimeWeatherWidget from './DateTimeWeatherWidget.tsx';
 
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -82,6 +83,7 @@ const LoginPage: React.FC = () => {
 
   return (
     <div className="login-page">
+      <DateTimeWeatherWidget />
       <div className="login-container">
         <div className="login-header">
           <h1>IKEA Sales Planning</h1>

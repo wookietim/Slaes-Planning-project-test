@@ -1,0 +1,349 @@
+# IKEA Sales Planning Application - Complete Project Specifications
+
+## Project Overview
+A comprehensive React TypeScript application for IKEA sales planning with role-based access control, workflow management, and data persistence. The system supports multiple user roles (Input Users, Reviewers, Admins) with specific permissions and navigation controls.
+
+## Technology Stack
+
+### Frontend
+- **Framework**: React 18 with TypeScript
+- **Build Tool**: Vite
+- **Routing**: React Router DOM v6
+- **Styling**: CSS modules with responsive design
+- **State Management**: React hooks (useState, useEffect)
+- **Local Storage**: User authentication and role persistence
+
+### Backend
+- **Runtime**: Node.js with Express
+- **Database**: SQLite3 with file-based storage
+- **API**: RESTful endpoints with JSON responses
+- **Middleware**: CORS enabled, JSON parsing
+- **Development**: Nodemon for auto-restart, Concurrently for parallel processes
+
+### Development Tools
+- **Package Manager**: npm
+- **TypeScript**: Full type safety with interfaces
+- **Dev Server**: Vite dev server with HMR
+- **Process Management**: Concurrently for running frontend + backend
+
+## Architecture Overview
+
+### User Role System
+1. **Input Users**: Create and submit sales plans
+2. **Reviewers**: Review, approve, deny, or publish individual plan rows
+3. **Admins**: Manage users, roles, and system configuration
+4. **Special User**: timothy.collins@ingka.ikea.com has all privileges by default
+
+### Application Flow
+1. **Login** → Role-based redirect (Admin→/admin, InputUser→/main, Reviewer→/review, Other→/published)
+2. **Data Entry** → Validation → Submission to review queue
+3. **Review Process** → Row-level approval/denial with status persistence
+4. **Publication** → Approved rows become publicly viewable
+5. **Administration** → User and role management interface
+
+## Core Components & Features
+
+### 1. Authentication System (LoginPage.tsx)
+- Email-based authentication (password validation optional)
+- Automatic role initialization for predefined users
+- Role-based redirect logic with special handling for timothy.collins
+- LocalStorage persistence for user sessions
+
+### 2. Main Planning Interface (App.tsx - MainPage)
+- Sales planning form with dynamic row management
+- Country, year, tertial, HFB, turnover, profit, quantity, GM fields
+- Form validation with comprehensive error checking
+- Existing plans display with filtering (year, country, HFB, row status)
+- Inline editing for denied rows with resubmission capability
+- Sample data loading functionality
+
+### 3. Review System (ReviewPage.tsx)
+- Row-level review interface showing individual plan entries
+- Approve/Deny/Publish actions with status persistence
+- Filtering by status, country, year, HFB
+- Progress tracking with statistics display
+- Row status persistence in localStorage with sync across components
+
+### 4. Published Data View (PublishedPage.tsx)
+- Display of published (approved) plan rows only
+- Advanced filtering: country, year, HFB with dynamic options
+- Data export capabilities
+- Read-only interface for published data
+
+### 5. Admin Panel (AdminPage.tsx)
+- User management: add, edit, delete users
+- Role assignment: inputUser, reviewer, admin toggles
+- Predefined user initialization
+- Email validation and role conflict prevention
+- Special handling for timothy.collins admin access
+
+### 6. Data Management (DataManagementPage.tsx)
+- Export functionality for sales plans data
+- Administrative data operations
+- Bulk data management tools
+
+## Database Schema
+
+### Sales Plans Table
+```sql
+CREATE TABLE sales_plans (
+  id TEXT PRIMARY KEY,
+  country TEXT NOT NULL,
+  year TEXT NOT NULL,
+  status TEXT NOT NULL, -- 'draft', 'review', 'approved', 'published'
+  user TEXT,
+  rows TEXT NOT NULL, -- JSON array of row objects
+  createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
+)
+```
+
+### Row Object Structure
+```javascript
+{
+  tertial: string,     // 'T1', 'T2', 'T3'
+  hfb: string,         // 'Sales', 'Holiday', 'General', 'Special'
+  salesGoal: number,   // Turnover target
+  actualSales: number, // Profit actual
+  variance: number,    // GM calculation
+  qty: number         // Quantity
+}
+```
+
+## API Endpoints
+
+### Sales Plans Management
+- `GET /api/sales-plans` - Retrieve all sales plans
+- `POST /api/sales-plans` - Create new sales plan
+- `PUT /api/sales-plans/:id` - Update existing plan
+- `DELETE /api/sales-plans` - Delete all plans (admin)
+- `DELETE /api/sales-plans/:id` - Delete specific plan
+
+### Request/Response Format
+```javascript
+// POST/PUT Request Body
+{
+  country: string,
+  year: string,
+  status: 'draft' | 'review' | 'approved' | 'published',
+  user?: string,
+  rows: Array<RowObject>
+}
+
+// Response Format
+{
+  id: string,
+  country: string,
+  year: string,
+  status: string,
+  user: string,
+  rows: Array<RowObject>,
+  createdAt: string,
+  updatedAt: string
+}
+```
+
+## UI/UX Specifications
+
+### Navigation System
+- Tab-based navigation using React Router
+- Role-based tab visibility (Main for InputUsers, Review for Reviewers, etc.)
+- Consistent header across all pages with IKEA branding
+- Active tab highlighting with emoji icons
+
+### Form Design
+- Dynamic row addition/removal with unique IDs
+- Dropdown selections for country, HFB, tertial
+- Number input validation for financial fields
+- Inline editing capability for denied rows
+- Comprehensive validation with error messaging
+
+### Data Display
+- Table-based layouts with sorting capabilities
+- Status badges with color coding (pending/approved/denied/published)
+- Filter controls with dynamic option generation
+- Responsive design for mobile compatibility
+
+### User Feedback
+- Status messages for actions (success/error alerts)
+- Loading states during data operations
+- Confirmation dialogs for destructive actions
+- Progress indicators for review workflows
+
+## Role-Based Access Control
+
+### Route Protection
+- `ProtectedRoute` component with role checking
+- Automatic redirection for unauthorized access
+- Special case handling for timothy.collins
+- Route-level access control enforcement
+
+### Permission Matrix
+```
+Route         | InputUser | Reviewer | Admin | Public
+/main         |    ✅     |    ❌    |   ✅  |   ❌
+/review       |    ❌     |    ✅    |   ✅  |   ❌
+/published    |    ✅     |    ✅    |   ✅  |   ✅
+/admin        |    ❌     |    ❌    |   ✅  |   ❌
+/data         |    ✅     |    ❌    |   ✅  |   ❌
+```
+
+### User Role Storage
+```javascript
+// LocalStorage Structure
+{
+  "currentUser": "email@domain.com",
+  "userRoles": {
+    "email@domain.com": {
+      "inputUser": boolean,
+      "reviewer": boolean,
+      "admin": boolean
+    }
+  },
+  "reviewRowStatuses": {
+    "planId-rowIndex": "pending|approved|denied|published"
+  }
+}
+```
+
+## Data Flow & State Management
+
+### Client-Side State
+- Form data (SalesData interface)
+- Workflow status (draft/review/approved/published)
+- User authentication state
+- Row review statuses with localStorage sync
+- Filter states across components
+
+### State Synchronization
+- Cross-component localStorage monitoring
+- Real-time updates for review status changes
+- Automatic refresh of data tables
+- Form reset on navigation
+
+### Validation Rules
+1. **Country**: Required selection from predefined list
+2. **Year**: Required, numeric input
+3. **Rows**: At least one row required
+4. **Row Fields**: All fields required (tertial, HFB, turnover, profit, qty, gm)
+5. **Numeric Fields**: Must be valid numbers, variance calculation
+6. **Email Validation**: Proper email format for user management
+
+## Installation & Setup
+
+### Prerequisites
+```bash
+Node.js (v16+)
+npm (v8+)
+```
+
+### Installation Steps
+```bash
+npm install react react-dom react-router-dom
+npm install typescript @types/react @types/react-dom
+npm install vite @vitejs/plugin-react
+npm install express sqlite3 cors
+npm install @types/express @types/cors
+npm install nodemon concurrently --save-dev
+```
+
+### Project Structure
+```
+src/
+├── components/
+│   ├── LoginPage.tsx
+│   ├── ReviewPage.tsx
+│   ├── PublishedPage.tsx
+│   ├── DataManagementPage.tsx
+│   ├── SalesPlanningForm.tsx
+│   └── WorkflowControls.tsx
+├── services/
+│   └── apiService.ts
+├── types.ts
+├── App.tsx
+├── App.css
+└── main.tsx
+
+server/
+├── index.js
+└── database.db (auto-generated)
+
+public/
+└── index.html
+```
+
+### Development Scripts
+```json
+{
+  "scripts": {
+    "dev": "vite",
+    "server": "nodemon server/index.js",
+    "start": "concurrently \"npm run server\" \"npm run dev\"",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  }
+}
+```
+
+## Special Implementation Notes
+
+### Navigation Fix
+- All navigation uses React Router's `useNavigate` hook
+- No `<a href>` tags to prevent page reloads
+- Consistent button-based navigation across components
+
+### Timothy Collins Special Handling
+- Automatic admin access regardless of stored roles
+- Priority redirect to admin page on login
+- Special case in all role checking functions
+
+### Row Status Management
+- Unique row identification: `${planId}-${rowIndex}`
+- Persistent status tracking across sessions
+- Real-time synchronization between components
+
+### Data Persistence
+- SQLite database for plan storage
+- LocalStorage for user sessions and review states
+- Automatic data synchronization on state changes
+
+## Testing Scenarios
+
+### User Authentication
+1. Login with timothy.collins@ingka.ikea.com → Should redirect to /admin
+2. Login with undefined user → Should show role assignment in admin
+3. Clear browser storage → Should reset all user data
+
+### Sales Planning Workflow
+1. Create plan → Validation → Submit for review
+2. Review individual rows → Approve/Deny → Status persistence
+3. Publish approved rows → Display in published view
+4. Edit denied rows → Resubmit → Reset to pending status
+
+### Data Management
+1. Filter plans by multiple criteria
+2. Export data functionality
+3. Sample data loading
+4. Inline editing with validation
+
+## Production Considerations
+
+### Security
+- Input sanitization on all form fields
+- SQL injection prevention with parameterized queries
+- XSS protection in data display
+- Role-based access control enforcement
+
+### Performance
+- Efficient data filtering and sorting
+- Minimal re-renders with proper React patterns
+- LocalStorage optimization for large datasets
+- Database indexing for query performance
+
+### Scalability
+- Component-based architecture for easy extension
+- Modular API design for additional endpoints
+- Configurable user roles and permissions
+- Extensible filtering and sorting systems
+
+This specification provides complete implementation details for reproducing the IKEA Sales Planning application with all its features, architecture, and functionality.

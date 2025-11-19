@@ -9,6 +9,7 @@ import PublishedPage from './components/PublishedPage.tsx';
 import LoginPage from './components/LoginPage.tsx';
 import DataManagementPage from './components/DataManagementPage.tsx';
 import AdminPage from './AdminPage.tsx';
+import DateTimeWeatherWidget from './components/DateTimeWeatherWidget.tsx';
 import './App.css';
 
 // Route protection component
@@ -465,9 +466,12 @@ const MainPage: React.FC = () => {
   const getFilterOptions = () => {
     // Fixed year range from 2020 to 2025
     const years = Array.from({ length: 6 }, (_, i) => (2020 + i).toString());
-    const countries = [...new Set(existingPlans.map(plan => plan.country))].sort();
+    
+    // Fixed country options to match form dropdown exactly
+    const countries = ['USA', 'Sweden', 'France', 'Mexico'];
+    
     const planStatuses = [...new Set(existingPlans.map(plan => plan.status))].sort();
-    const hfbOptions = ['Sales', 'Holiday', 'General', 'Special']; // Match the top form options
+    const hfbOptions = ['HFB 01 Living room seating', 'HFB 02 Store and organise furniture', 'HFB 03 Workspaces', 'HFB 04 Bedroom furniture', 'HFB 05 Beds & Mattresses', 'HFB 06 Bathroom', 'HFB 07 Kitchen']; // New HFB options
     
     // Get row-level statuses including pending
     const rowStatusOptions = ['pending', 'approved', 'denied', 'published'];
@@ -551,7 +555,7 @@ const MainPage: React.FC = () => {
         throw new Error('Failed to delete existing data');
       }
 
-      // Sample data for USA and Sweden, 2024 and 2025, Sales HFB
+      // Sample data for USA and Sweden, 2024 and 2025, with new HFB values
       const sampleData = [
         // USA 2024
         {
@@ -560,9 +564,9 @@ const MainPage: React.FC = () => {
           status: "review",
           user: "timothy.collins@ingka.ikea.com",
           rows: [
-            {"tertial": "T1", "hfb": "Sales", "salesGoal": 180000, "actualSales": 175000, "variance": -5000, "qty": 720},
-            {"tertial": "T2", "hfb": "Sales", "salesGoal": 200000, "actualSales": 210000, "variance": 10000, "qty": 800},
-            {"tertial": "T3", "hfb": "Sales", "salesGoal": 190000, "actualSales": 195000, "variance": 5000, "qty": 760}
+            {"tertial": "T1", "hfb": "HFB 01 Living room seating", "salesGoal": 180000, "actualSales": 175000, "variance": -5000, "qty": 720},
+            {"tertial": "T2", "hfb": "HFB 01 Living room seating", "salesGoal": 200000, "actualSales": 210000, "variance": 10000, "qty": 800},
+            {"tertial": "T3", "hfb": "HFB 01 Living room seating", "salesGoal": 190000, "actualSales": 195000, "variance": 5000, "qty": 760}
           ]
         },
         // USA 2025
@@ -572,9 +576,9 @@ const MainPage: React.FC = () => {
           status: "review",
           user: "timothy.collins@ingka.ikea.com",
           rows: [
-            {"tertial": "T1", "hfb": "Sales", "salesGoal": 220000, "actualSales": 215000, "variance": -5000, "qty": 880},
-            {"tertial": "T2", "hfb": "Sales", "salesGoal": 240000, "actualSales": 250000, "variance": 10000, "qty": 960},
-            {"tertial": "T3", "hfb": "Sales", "salesGoal": 230000, "actualSales": 235000, "variance": 5000, "qty": 920}
+            {"tertial": "T1", "hfb": "HFB 01 Living room seating", "salesGoal": 220000, "actualSales": 215000, "variance": -5000, "qty": 880},
+            {"tertial": "T2", "hfb": "HFB 01 Living room seating", "salesGoal": 240000, "actualSales": 250000, "variance": 10000, "qty": 960},
+            {"tertial": "T3", "hfb": "HFB 01 Living room seating", "salesGoal": 230000, "actualSales": 235000, "variance": 5000, "qty": 920}
           ]
         },
         // Sweden 2024
@@ -584,9 +588,9 @@ const MainPage: React.FC = () => {
           status: "review", 
           user: "timothy.collins@ingka.ikea.com",
           rows: [
-            {"tertial": "T1", "hfb": "Sales", "salesGoal": 150000, "actualSales": 145000, "variance": -5000, "qty": 580},
-            {"tertial": "T2", "hfb": "Sales", "salesGoal": 160000, "actualSales": 170000, "variance": 10000, "qty": 640},
-            {"tertial": "T3", "hfb": "Sales", "salesGoal": 155000, "actualSales": 160000, "variance": 5000, "qty": 620}
+            {"tertial": "T1", "hfb": "HFB 01 Living room seating", "salesGoal": 150000, "actualSales": 145000, "variance": -5000, "qty": 580},
+            {"tertial": "T2", "hfb": "HFB 01 Living room seating", "salesGoal": 160000, "actualSales": 170000, "variance": 10000, "qty": 640},
+            {"tertial": "T3", "hfb": "HFB 01 Living room seating", "salesGoal": 155000, "actualSales": 160000, "variance": 5000, "qty": 620}
           ]
         },
         // Sweden 2025
@@ -596,9 +600,9 @@ const MainPage: React.FC = () => {
           status: "review",
           user: "timothy.collins@ingka.ikea.com",
           rows: [
-            {"tertial": "T1", "hfb": "Sales", "salesGoal": 170000, "actualSales": 165000, "variance": -5000, "qty": 680},
-            {"tertial": "T2", "hfb": "Sales", "salesGoal": 180000, "actualSales": 190000, "variance": 10000, "qty": 720},
-            {"tertial": "T3", "hfb": "Sales", "salesGoal": 175000, "actualSales": 180000, "variance": 5000, "qty": 700}
+            {"tertial": "T1", "hfb": "HFB 01 Living room seating", "salesGoal": 170000, "actualSales": 165000, "variance": -5000, "qty": 680},
+            {"tertial": "T2", "hfb": "HFB 01 Living room seating", "salesGoal": 180000, "actualSales": 190000, "variance": 10000, "qty": 720},
+            {"tertial": "T3", "hfb": "HFB 01 Living room seating", "salesGoal": 175000, "actualSales": 180000, "variance": 5000, "qty": 700}
           ]
         }
       ];
@@ -654,6 +658,7 @@ const MainPage: React.FC = () => {
 
   return (
     <div className="app">
+      <DateTimeWeatherWidget />
       <header className="app-header">
         <h1>IKEA Sales Planning</h1>
         

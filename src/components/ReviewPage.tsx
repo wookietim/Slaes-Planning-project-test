@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useLocation, useSearchParams, useNavigate } from 'react-router-dom';
 import { SalesData } from '../types';
 import apiService, { SalesPlan } from '../services/apiService';
+import DateTimeWeatherWidget from './DateTimeWeatherWidget.tsx';
 
 interface LocationState {
   salesData: SalesData;
@@ -262,6 +263,7 @@ const ReviewPage: React.FC = () => {
 
   return (
     <div className="review-page">
+      <DateTimeWeatherWidget />
       <div className="review-container">
         <header className="app-header">
           <h1>IKEA Sales Planning</h1>

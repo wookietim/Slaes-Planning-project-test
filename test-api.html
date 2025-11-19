@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>API Test</title>
+</head>
+<body>
+    <h1>API Connectivity Test</h1>
+    <button onclick="testAPI()">Test API</button>
+    <div id="result"></div>
+
+    <script>
+        async function testAPI() {
+            const resultDiv = document.getElementById('result');
+            try {
+                console.log('Testing API connection...');
+                const response = await fetch('http://localhost:3001/api/sales-plans');
+                console.log('Response status:', response.status);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                console.log('Data received:', data);
+                
+                resultDiv.innerHTML = `
+                    <h2>✅ API Test Successful!</h2>
+                    <p>Status: ${response.status}</p>
+                    <p>Data received: ${data.length} sales plans</p>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+            } catch (error) {
+                console.error('API Test Failed:', error);
+                resultDiv.innerHTML = `
+                    <h2>❌ API Test Failed!</h2>
+                    <p>Error: ${error.message}</p>
+                    <p>This suggests the frontend cannot reach the backend API.</p>
+                `;
+            }
+        }
+        
+        // Auto-run test when page loads
+        window.onload = testAPI;
+    </script>
+</body>
+</html>

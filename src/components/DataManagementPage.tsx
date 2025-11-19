@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import apiService, { SalesPlan } from '../services/apiService';
+import DateTimeWeatherWidget from './DateTimeWeatherWidget.tsx';
 
 const DataManagementPage: React.FC = () => {
   // Check if current user has reviewer role
@@ -124,6 +125,7 @@ const DataManagementPage: React.FC = () => {
 
   return (
     <div className="data-management-page">
+      <DateTimeWeatherWidget />
       <div className="data-management-container">
         <header className="app-header">
           <h1>IKEA Sales Planning</h1>

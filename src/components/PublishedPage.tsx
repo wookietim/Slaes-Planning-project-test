@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import apiService, { SalesPlan } from '../services/apiService';
+import DateTimeWeatherWidget from './DateTimeWeatherWidget.tsx';
 import './PublishedPage.css';
 
 interface PublishedRowData {
@@ -14,6 +15,13 @@ interface PublishedRowData {
   variance: number;
   createdAt: Date;
   updatedAt: Date;
+}
+
+interface ProductDetail {
+  name: string;
+  salesGoal: number;
+  actualSales: number;
+  variance: number;
 }
 
 const PublishedPage: React.FC = () => {
@@ -53,6 +61,9 @@ const PublishedPage: React.FC = () => {
   const [yearFilter, setYearFilter] = useState<string>(new Date().getFullYear().toString());
   const [countryFilter, setCountryFilter] = useState<string>('All');
   const [hfbFilter, setHfbFilter] = useState<string>('All');
+  
+  // Expanded rows state
+  const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
 
   // Load published plans
   useEffect(() => {
@@ -119,8 +130,8 @@ const PublishedPage: React.FC = () => {
     // Fixed country options (same as main page) 
     const countries = ['Sweden', 'Denmark', 'Norway', 'Finland', 'USA'].sort();
     
-    // Fixed HFB options (same as main page)
-    const hfbOptions = ['Sales', 'Holiday', 'General', 'Special'];
+    // Fixed HFB options (new standardized values)
+    const hfbOptions = ['HFB 01 Living room seating', 'HFB 02 Store and organise furniture', 'HFB 03 Workspaces', 'HFB 04 Bedroom furniture', 'HFB 05 Beds & Mattresses', 'HFB 06 Bathroom', 'HFB 07 Kitchen'];
     
     return { years, countries, hfbOptions };
   };
@@ -136,6 +147,56 @@ const PublishedPage: React.FC = () => {
       return true;
     });
   }, [publishedRows, yearFilter, countryFilter, hfbFilter]);
+
+  // Generate product details for a given row
+  const generateProductDetails = (row: PublishedRowData): ProductDetail[] => {
+    const products = ['Skogsta', 'Billi', 'Hagernas', 'Fengommare'];
+    const productDetails: ProductDetail[] = [];
+    
+    // Generate realistic product breakdowns that sum to the row totals
+    const remainingSalesGoal = row.salesGoal;
+    const remainingActualSales = row.actualSales;
+    
+    products.forEach((productName, index) => {
+      if (index === products.length - 1) {
+        // Last product gets the remainder
+        const salesGoal = remainingSalesGoal - productDetails.reduce((sum, p) => sum + p.salesGoal, 0);
+        const actualSales = remainingActualSales - productDetails.reduce((sum, p) => sum + p.actualSales, 0);
+        productDetails.push({
+          name: productName,
+          salesGoal: Math.max(0, salesGoal),
+          actualSales: Math.max(0, actualSales),
+          variance: actualSales - salesGoal
+        });
+      } else {
+        // Generate a percentage for this product (15-40% of remaining)
+        const percentage = 0.15 + (Math.random() * 0.25); // 15-40%
+        const salesGoal = Math.round(remainingSalesGoal * percentage);
+        const actualSalesVariation = 0.8 + (Math.random() * 0.4); // 80-120% of goal
+        const actualSales = Math.round(salesGoal * actualSalesVariation);
+        
+        productDetails.push({
+          name: productName,
+          salesGoal,
+          actualSales,
+          variance: actualSales - salesGoal
+        });
+      }
+    });
+    
+    return productDetails;
+  };
+
+  // Toggle row expansion
+  const toggleRowExpansion = (rowKey: string) => {
+    const newExpandedRows = new Set(expandedRows);
+    if (newExpandedRows.has(rowKey)) {
+      newExpandedRows.delete(rowKey);
+    } else {
+      newExpandedRows.add(rowKey);
+    }
+    setExpandedRows(newExpandedRows);
+  };
 
   if (loading) {
     return (
@@ -155,6 +216,7 @@ const PublishedPage: React.FC = () => {
 
   return (
     <div className="published-page">
+      <DateTimeWeatherWidget />
       <header className="app-header">
         <h1>IKEA Sales Planning</h1>
         
@@ -253,7 +315,7 @@ const PublishedPage: React.FC = () => {
             </span>
           </div>
           <div className="stat-item">
-            <span className="stat-label">Total Actual Sales:</span>
+            <span className="stat-label">Total Year-to-Date Sales:</span>
             <span className="stat-value">
               {filteredRows.reduce((sum, row) => sum + row.actualSales, 0).toLocaleString()}
             </span>
@@ -271,31 +333,90 @@ const PublishedPage: React.FC = () => {
           <table className="published-table">
             <thead>
               <tr>
+                <th></th>
                 <th>Year</th>
                 <th>Country</th>
                 <th>Tertial</th>
                 <th>HFB</th>
                 <th>Sales Goal</th>
-                <th>Actual Sales</th>
+                <th>Year-to-Date Sales</th>
                 <th>Variance</th>
                 <th>Published Date</th>
               </tr>
             </thead>
             <tbody>
-              {filteredRows.map((row, index) => (
-                <tr key={`${row.planId}-${row.tertial}-${index}`}>
-                  <td>{row.year}</td>
-                  <td>{row.country}</td>
-                  <td>{row.tertial}</td>
-                  <td>{row.hfb}</td>
-                  <td className="number">{row.salesGoal.toLocaleString()}</td>
-                  <td className="number">{row.actualSales.toLocaleString()}</td>
-                  <td className={`number ${row.variance >= 0 ? 'positive' : 'negative'}`}>
-                    {row.variance >= 0 ? '+' : ''}{row.variance.toLocaleString()}
-                  </td>
-                  <td>{new Date(row.updatedAt).toLocaleDateString()}</td>
-                </tr>
-              ))}
+              {filteredRows.map((row, index) => {
+                const rowKey = `${row.planId}-${row.tertial}-${index}`;
+                const isExpanded = expandedRows.has(rowKey);
+                const productDetails = generateProductDetails(row);
+                
+                return (
+                  <React.Fragment key={rowKey}>
+                    <tr className="main-row">
+                      <td>
+                        <button 
+                          className="expand-button"
+                          onClick={() => toggleRowExpansion(rowKey)}
+                          title={isExpanded ? "Collapse product details" : "Expand product details"}
+                        >
+                          {isExpanded ? '▼' : '▶'}
+                        </button>
+                      </td>
+                      <td>{row.year}</td>
+                      <td>{row.country}</td>
+                      <td>{row.tertial}</td>
+                      <td>{row.hfb}</td>
+                      <td>{row.salesGoal.toLocaleString()}</td>
+                      <td>{row.actualSales.toLocaleString()}</td>
+                      <td className={row.variance >= 0 ? 'positive' : 'negative'}>
+                        {row.variance >= 0 ? '+' : ''}{row.variance.toLocaleString()}
+                      </td>
+                      <td>{new Date(row.createdAt).toLocaleDateString()}</td>
+                    </tr>
+                    
+                    {isExpanded && (
+                      <tr className="expanded-row">
+                        <td colSpan={9}>
+                          <div className="product-details">
+                            <table className="product-table">
+                              <thead>
+                                <tr>
+                                  <th></th>
+                                  <th></th>
+                                  <th></th>
+                                  <th></th>
+                                  <th></th>
+                                  <th>Product</th>
+                                  <th>Sales Goal</th>
+                                  <th>Year-to-Date Sales</th>
+                                  <th>Variance</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {productDetails.map((product) => (
+                                  <tr key={product.name}>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td className="product-name">{product.name}</td>
+                                    <td>{product.salesGoal.toLocaleString()}</td>
+                                    <td>{product.actualSales.toLocaleString()}</td>
+                                    <td className={product.variance >= 0 ? 'positive' : 'negative'}>
+                                      {product.variance >= 0 ? '+' : ''}{product.variance.toLocaleString()}
+                                    </td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </React.Fragment>
+                );
+              })}
             </tbody>
           </table>
         </div>

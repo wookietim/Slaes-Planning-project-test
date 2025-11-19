@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import DateTimeWeatherWidget from './components/DateTimeWeatherWidget.tsx';
 
 interface UserRoles {
   inputUser: boolean;
@@ -277,6 +278,7 @@ const AdminPage: React.FC = () => {
 
   return (
     <div className="admin-page">
+      <DateTimeWeatherWidget />
       <header className="app-header">
         <h1>IKEA Sales Planning</h1>
         

@@ -119,43 +119,21 @@ const SalesPlanningForm: React.FC<SalesPlanningFormProps> = ({
       <div className="hfb-filters">
         <div className="filter-section">
           <label htmlFor="hfbFilter">Filter by HFB:</label>
-          <div className="filter-buttons">
-            <button 
-              type="button"
-              className={`filter-btn ${hfbFilter === 'All' ? 'active' : ''}`}
-              onClick={() => setHfbFilter('All')}
-            >
-              All
-            </button>
-            <button 
-              type="button"
-              className={`filter-btn ${hfbFilter === 'Sales' ? 'active' : ''}`}
-              onClick={() => setHfbFilter('Sales')}
-            >
-              Sales
-            </button>
-            <button 
-              type="button"
-              className={`filter-btn ${hfbFilter === 'Holiday' ? 'active' : ''}`}
-              onClick={() => setHfbFilter('Holiday')}
-            >
-              Holiday
-            </button>
-            <button 
-              type="button"
-              className={`filter-btn ${hfbFilter === 'General' ? 'active' : ''}`}
-              onClick={() => setHfbFilter('General')}
-            >
-              General
-            </button>
-            <button 
-              type="button"
-              className={`filter-btn ${hfbFilter === 'Special' ? 'active' : ''}`}
-              onClick={() => setHfbFilter('Special')}
-            >
-              Special
-            </button>
-          </div>
+          <select
+            id="hfbFilter"
+            value={hfbFilter}
+            onChange={(e) => setHfbFilter(e.target.value)}
+            className="filter-select"
+          >
+            <option value="All">All HFB</option>
+            <option value="HFB 01 Living room seating">HFB 01 Living room seating</option>
+            <option value="HFB 02 Store and organise furniture">HFB 02 Store and organise furniture</option>
+            <option value="HFB 03 Workspaces">HFB 03 Workspaces</option>
+            <option value="HFB 04 Bedroom furniture">HFB 04 Bedroom furniture</option>
+            <option value="HFB 05 Beds & Mattresses">HFB 05 Beds & Mattresses</option>
+            <option value="HFB 06 Bathroom">HFB 06 Bathroom</option>
+            <option value="HFB 07 Kitchen">HFB 07 Kitchen</option>
+          </select>
         </div>
       </div>
 
@@ -192,10 +170,13 @@ const SalesPlanningForm: React.FC<SalesPlanningFormProps> = ({
                 className="hfb-select"
               >
                 <option value="">Select HFB</option>
-                <option value="Sales">Sales</option>
-                <option value="Holiday">Holiday</option>
-                <option value="General">General</option>
-                <option value="Special">Special</option>
+                <option value="HFB 01 Living room seating">HFB 01 Living room seating</option>
+                <option value="HFB 02 Store and organise furniture">HFB 02 Store and organise furniture</option>
+                <option value="HFB 03 Workspaces">HFB 03 Workspaces</option>
+                <option value="HFB 04 Bedroom furniture">HFB 04 Bedroom furniture</option>
+                <option value="HFB 05 Beds & Mattresses">HFB 05 Beds & Mattresses</option>
+                <option value="HFB 06 Bathroom">HFB 06 Bathroom</option>
+                <option value="HFB 07 Kitchen">HFB 07 Kitchen</option>
               </select>
             </div>
             <div className="input-cell">

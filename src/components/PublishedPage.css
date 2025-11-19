@@ -168,6 +168,7 @@
   padding: 12px;
   border-bottom: 1px solid #eee;
   vertical-align: middle;
+  text-align: left;
 }
 
 .published-table tbody tr:hover {
@@ -175,7 +176,7 @@
 }
 
 .published-table .number {
-  text-align: right;
+  text-align: left;
   font-weight: 600;
   font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
 }
@@ -186,6 +187,104 @@
 
 .published-table .negative {
   color: #f44336;
+}
+
+/* Expandable row styles */
+.expand-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  color: #0058a3;
+  font-size: 12px;
+  font-weight: bold;
+  transition: transform 0.2s ease;
+  border-radius: 3px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+}
+
+.expand-button:hover {
+  background-color: #f0f8ff;
+  transform: scale(1.1);
+}
+
+.main-row {
+  cursor: pointer;
+}
+
+.expanded-row {
+  background-color: #fafafa !important;
+}
+
+.expanded-row td {
+  padding: 0 !important;
+  border-bottom: none !important;
+}
+
+.product-details {
+  padding: 0;
+  margin: 0;
+}
+
+.product-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  background-color: #fafafa;
+  margin: 0;
+}
+
+.product-table thead {
+  display: none; /* Hide the header since we're aligning with main table */
+}
+
+.product-table th,
+.product-table td {
+  padding: 8px 12px;
+  border: none;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.product-table tbody tr {
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.product-table tbody tr:nth-child(odd) {
+  background-color: #f8f9fa;
+}
+
+.product-table tbody tr:nth-child(even) {
+  background-color: white;
+}
+
+.product-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.product-table tbody tr:hover {
+  background-color: #e3f2fd !important;
+}
+
+.product-table .product-name {
+  font-weight: 600;
+  color: #0058a3;
+  padding-left: 20px;
+  text-align: left;
+}
+
+.product-table .positive {
+  color: #28a745;
+  font-weight: 600;
+}
+
+.product-table .negative {
+  color: #dc3545;
+  font-weight: 600;
 }
 
 /* Responsive design */
