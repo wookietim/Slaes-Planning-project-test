@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { SalesData, SalesDataRow } from '../types';
 
 interface SalesPlanningFormProps {
@@ -6,16 +6,18 @@ interface SalesPlanningFormProps {
   onDataChange: (data: SalesData) => void;
   isReadOnly?: boolean;
   workflowControls?: React.ReactNode;
+  onSave?: () => void;
+  isSaving?: boolean;
 }
 
 const SalesPlanningForm: React.FC<SalesPlanningFormProps> = ({
   data,
   onDataChange,
   isReadOnly = false,
-  workflowControls
+  workflowControls,
+  onSave,
+  isSaving = false
 }) => {
-  const [hfbFilter, setHfbFilter] = useState<string>('All');
-
   const handleCountryChange = (value: string) => {
     onDataChange({
       ...data,
@@ -30,11 +32,6 @@ const SalesPlanningForm: React.FC<SalesPlanningFormProps> = ({
     });
   };
 
-  // Filter rows based on selected HFB filter
-  const filteredRows = hfbFilter === 'All' 
-    ? data.rows 
-    : data.rows.filter(row => row.hfb === hfbFilter);
-
   const handleRowChange = (rowId: string, field: keyof Omit<SalesDataRow, 'id'>, value: string) => {
     const updatedRows = data.rows.map(row => 
       row.id === rowId ? { ...row, [field]: value } : row
@@ -46,9 +43,12 @@ const SalesPlanningForm: React.FC<SalesPlanningFormProps> = ({
   };
 
   const addNewRow = () => {
+    // Get the tertial value from the last row, or default to 'FY'
+    const lastRowTertial = data.rows.length > 0 ? data.rows[data.rows.length - 1].tertial : 'FY';
+    
     const newRow: SalesDataRow = {
       id: Date.now().toString(),
-      tertial: `T${data.rows.length + 1}`,
+      tertial: lastRowTertial,
       hfb: '',
       turnover: '',
       profit: '',
@@ -116,27 +116,6 @@ const SalesPlanningForm: React.FC<SalesPlanningFormProps> = ({
         </div>
       </div>
 
-      <div className="hfb-filters">
-        <div className="filter-section">
-          <label htmlFor="hfbFilter">Filter by HFB:</label>
-          <select
-            id="hfbFilter"
-            value={hfbFilter}
-            onChange={(e) => setHfbFilter(e.target.value)}
-            className="filter-select"
-          >
-            <option value="All">All HFB</option>
-            <option value="HFB 01 Living room seating">HFB 01 Living room seating</option>
-            <option value="HFB 02 Store and organise furniture">HFB 02 Store and organise furniture</option>
-            <option value="HFB 03 Workspaces">HFB 03 Workspaces</option>
-            <option value="HFB 04 Bedroom furniture">HFB 04 Bedroom furniture</option>
-            <option value="HFB 05 Beds & Mattresses">HFB 05 Beds & Mattresses</option>
-            <option value="HFB 06 Bathroom">HFB 06 Bathroom</option>
-            <option value="HFB 07 Kitchen">HFB 07 Kitchen</option>
-          </select>
-        </div>
-      </div>
-
       <div className="form-grid">
         <div className="grid-headers">
           <div className="header-cell">Tertial</div>
@@ -148,7 +127,7 @@ const SalesPlanningForm: React.FC<SalesPlanningFormProps> = ({
           <div className="header-cell">Actions</div>
         </div>
 
-        {filteredRows.map((row) => (
+        {data.rows.map((row) => (
           <div key={row.id} className="grid-row">
             <div className="input-cell">
               <select
@@ -157,6 +136,7 @@ const SalesPlanningForm: React.FC<SalesPlanningFormProps> = ({
                 disabled={isReadOnly}
                 className="tertial-select"
               >
+                <option value="FY">FY</option>
                 <option value="T1">T1</option>
                 <option value="T2">T2</option>
                 <option value="T3">T3</option>
@@ -237,8 +217,18 @@ const SalesPlanningForm: React.FC<SalesPlanningFormProps> = ({
             onClick={addNewRow}
             title="Add new row"
           >
-            + Add New Tertial
+            + Add New Row
           </button>
+          {onSave && (
+            <button
+              className="btn save-btn"
+              onClick={onSave}
+              disabled={isSaving}
+              title="Save your current work"
+            >
+              {isSaving ? '💾 Saving...' : '💾 Save'}
+            </button>
+          )}
           {workflowControls && (
             <div className="workflow-controls-inline">
               {workflowControls}

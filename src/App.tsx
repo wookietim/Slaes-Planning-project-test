@@ -117,10 +117,10 @@ const MainPage: React.FC = () => {
   
   const [salesData, setSalesData] = useState<SalesData>({
     country: '',
-    year: '2025',
+    year: '2026',
     rows: [{
       id: '1',
-      tertial: 'T1',
+      tertial: 'FY',
       hfb: '',
       turnover: '',
       profit: '',
@@ -135,10 +135,13 @@ const MainPage: React.FC = () => {
   const [rowStatuses, setRowStatuses] = useState<Record<string, 'pending' | 'approved' | 'denied'>>({});
   const [editingRowId, setEditingRowId] = useState<string | null>(null);
   const [editingData, setEditingData] = useState<any>({});
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveMessage, setSaveMessage] = useState<string>('');
+  const [showResetDbModal, setShowResetDbModal] = useState(false);
 
   // Filter states for existing plans table
   const [filters, setFilters] = useState({
-    year: '2025', // Default to current year
+    year: '', // Empty to show all years by default
     country: '',
     hfb: '',
     status: ''
@@ -255,6 +258,64 @@ const MainPage: React.FC = () => {
       } catch (error) {
         console.error('Failed to auto-save data:', error);
       }
+    }
+  };
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    setSaveMessage('');
+    
+    try {
+      const currentUser = localStorage.getItem('currentUser');
+      
+      if (currentEntryId) {
+        // Update existing entry
+        await apiService.updateSalesPlan(currentEntryId, {
+          country: salesData.country,
+          year: salesData.year,
+          status: workflowStatus,
+          user: currentUser || undefined,
+          rows: salesData.rows.map(row => ({
+            tertial: row.tertial,
+            hfb: row.hfb,
+            salesGoal: parseFloat(row.turnover) || 0,
+            actualSales: parseFloat(row.profit) || 0,
+            variance: parseFloat(row.gm) || 0,
+            qty: parseFloat(row.qty) || 0
+          }))
+        });
+        setSaveMessage('✅ Changes saved successfully!');
+      } else {
+        // Create new entry
+        const result = await apiService.createSalesPlan({
+          country: salesData.country,
+          year: salesData.year,
+          status: workflowStatus,
+          user: currentUser || undefined,
+          rows: salesData.rows.map(row => ({
+            tertial: row.tertial,
+            hfb: row.hfb,
+            salesGoal: parseFloat(row.turnover) || 0,
+            actualSales: parseFloat(row.profit) || 0,
+            variance: parseFloat(row.gm) || 0,
+            qty: parseFloat(row.qty) || 0
+          }))
+        });
+        setCurrentEntryId(result.id);
+        setSaveMessage('✅ Data saved successfully!');
+      }
+      
+      // Reload plans
+      await loadExistingPlans();
+      
+      // Clear message after 3 seconds
+      setTimeout(() => setSaveMessage(''), 3000);
+    } catch (error) {
+      console.error('Failed to save data:', error);
+      setSaveMessage('❌ Failed to save. Please try again.');
+      setTimeout(() => setSaveMessage(''), 3000);
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -378,7 +439,7 @@ const MainPage: React.FC = () => {
       year: '2025',
       rows: [{
         id: '1',
-        tertial: 'T1',
+        tertial: 'FY',
         hfb: '',
         turnover: '',
         profit: '',
@@ -465,7 +526,7 @@ const MainPage: React.FC = () => {
   // Get unique values for filter dropdowns
   const getFilterOptions = () => {
     // Fixed year range from 2020 to 2025
-    const years = Array.from({ length: 6 }, (_, i) => (2020 + i).toString());
+    const years = Array.from({ length: 11 }, (_, i) => (2020 + i).toString());
     
     // Fixed country options to match form dropdown exactly
     const countries = ['USA', 'Sweden', 'France', 'Mexico'];
@@ -540,6 +601,32 @@ const MainPage: React.FC = () => {
     }
   };
 
+  const handleEditPlan = (plan: SalesPlan) => {
+    // Convert the plan data to the form format
+    const formData: SalesData = {
+      country: plan.country,
+      year: plan.year,
+      rows: plan.rows.map((row, index) => ({
+        id: `${plan.id}-${index}`,
+        tertial: row.tertial || row.quarter || 'FY',
+        hfb: row.hfb || '',
+        turnover: row.salesGoal.toString(),
+        profit: row.actualSales.toString(),
+        qty: row.qty?.toString() || '',
+        gm: row.variance.toString()
+      }))
+    };
+
+    // Load the data into the form
+    setSalesData(formData);
+    // Set status to draft to make it editable, unless it's already denied
+    setWorkflowStatus(plan.status === 'denied' ? 'denied' : 'draft');
+    setCurrentEntryId(plan.id);
+
+    // Scroll to top of page
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const handleLoadSampleData = async () => {
     if (!confirm('This will delete all existing data and load sample data. Are you sure?')) {
       return;
@@ -557,16 +644,16 @@ const MainPage: React.FC = () => {
 
       // Sample data for USA and Sweden, 2024 and 2025, with new HFB values
       const sampleData = [
-        // USA 2024
+        // USA 2025
         {
           country: "USA",
-          year: "2024",
+          year: "2025",
           status: "review",
           user: "timothy.collins@ingka.ikea.com",
           rows: [
-            {"tertial": "T1", "hfb": "HFB 01 Living room seating", "salesGoal": 180000, "actualSales": 175000, "variance": -5000, "qty": 720},
-            {"tertial": "T2", "hfb": "HFB 01 Living room seating", "salesGoal": 200000, "actualSales": 210000, "variance": 10000, "qty": 800},
-            {"tertial": "T3", "hfb": "HFB 01 Living room seating", "salesGoal": 190000, "actualSales": 195000, "variance": 5000, "qty": 760}
+            {"tertial": "FY", "hfb": "HFB 01 Living room seating", "salesGoal": 180000, "actualSales": 175000, "variance": -5000, "qty": 720},
+            {"tertial": "FY", "hfb": "HFB 02 Store and organise furniture", "salesGoal": 200000, "actualSales": 210000, "variance": 10000, "qty": 800},
+            {"tertial": "FY", "hfb": "HFB 03 Workspaces", "salesGoal": 190000, "actualSales": 195000, "variance": 5000, "qty": 760}
           ]
         },
         // USA 2025
@@ -577,32 +664,32 @@ const MainPage: React.FC = () => {
           user: "timothy.collins@ingka.ikea.com",
           rows: [
             {"tertial": "T1", "hfb": "HFB 01 Living room seating", "salesGoal": 220000, "actualSales": 215000, "variance": -5000, "qty": 880},
-            {"tertial": "T2", "hfb": "HFB 01 Living room seating", "salesGoal": 240000, "actualSales": 250000, "variance": 10000, "qty": 960},
-            {"tertial": "T3", "hfb": "HFB 01 Living room seating", "salesGoal": 230000, "actualSales": 235000, "variance": 5000, "qty": 920}
+            {"tertial": "T1", "hfb": "HFB 02 Store and organise furniture", "salesGoal": 240000, "actualSales": 250000, "variance": 10000, "qty": 960},
+            {"tertial": "T1", "hfb": "HFB 03 Workspaces", "salesGoal": 230000, "actualSales": 235000, "variance": 5000, "qty": 920}
           ]
         },
         // Sweden 2024
         {
-          country: "Sweden",
-          year: "2024",
+          country: "USA",
+          year: "2025",
           status: "review", 
           user: "timothy.collins@ingka.ikea.com",
           rows: [
-            {"tertial": "T1", "hfb": "HFB 01 Living room seating", "salesGoal": 150000, "actualSales": 145000, "variance": -5000, "qty": 580},
-            {"tertial": "T2", "hfb": "HFB 01 Living room seating", "salesGoal": 160000, "actualSales": 170000, "variance": 10000, "qty": 640},
-            {"tertial": "T3", "hfb": "HFB 01 Living room seating", "salesGoal": 155000, "actualSales": 160000, "variance": 5000, "qty": 620}
+            {"tertial": "T2", "hfb": "HFB 01 Living room seating", "salesGoal": 150000, "actualSales": 145000, "variance": 5000, "qty": 580},
+            {"tertial": "T2", "hfb": "HFB 02 Store and organise furniture", "salesGoal": 160000, "actualSales": 170000, "variance": 10000, "qty": 640},
+            {"tertial": "T2", "hfb": "HFB 03 Workspaces", "salesGoal": 155000, "actualSales": 160000, "variance": 5000, "qty": 620}
           ]
         },
         // Sweden 2025
         {
-          country: "Sweden",
+          country: "USA",
           year: "2025",
           status: "review",
           user: "timothy.collins@ingka.ikea.com",
           rows: [
-            {"tertial": "T1", "hfb": "HFB 01 Living room seating", "salesGoal": 170000, "actualSales": 165000, "variance": -5000, "qty": 680},
-            {"tertial": "T2", "hfb": "HFB 01 Living room seating", "salesGoal": 180000, "actualSales": 190000, "variance": 10000, "qty": 720},
-            {"tertial": "T3", "hfb": "HFB 01 Living room seating", "salesGoal": 175000, "actualSales": 180000, "variance": 5000, "qty": 700}
+            {"tertial": "T3", "hfb": "HFB 01 Living room seating", "salesGoal": 170000, "actualSales": 165000, "variance": -5000, "qty": 680},
+            {"tertial": "T3", "hfb": "HFB 02 Store and organise furniture", "salesGoal": 180000, "actualSales": 190000, "variance": 10000, "qty": 720},
+            {"tertial": "T3", "hfb": "HFB 03 Workspaces", "salesGoal": 175000, "actualSales": 180000, "variance": 5000, "qty": 700}
           ]
         }
       ];
@@ -632,7 +719,7 @@ const MainPage: React.FC = () => {
         year: '2025',
         rows: [{
           id: '1',
-          tertial: 'T1',
+          tertial: 'FY',
           hfb: '',
           turnover: '',
           profit: '',
@@ -649,6 +736,42 @@ const MainPage: React.FC = () => {
     } catch (error) {
       console.error('Failed to load sample data:', error);
       alert('Failed to load sample data. Please check the console for details.');
+    }
+  };
+
+  const handleResetDatabase = async () => {
+    try {
+      await apiService.clearAllData();
+      
+      // Clear row statuses
+      localStorage.removeItem('reviewRowStatuses');
+      setRowStatuses({});
+
+      // Reset the form to empty state
+      setSalesData({
+        country: '',
+        year: '2025',
+        rows: [{
+          id: '1',
+          tertial: 'FY',
+          hfb: '',
+          turnover: '',
+          profit: '',
+          qty: '',
+          gm: ''
+        }]
+      });
+      setCurrentEntryId(null);
+      setWorkflowStatus('draft');
+
+      // Refresh the plans list
+      await loadExistingPlans();
+      
+      setShowResetDbModal(false);
+      alert('Database cleared successfully! All plans have been deleted.');
+    } catch (error) {
+      console.error('Failed to clear database:', error);
+      alert('Failed to clear database. Please check the console for details.');
     }
   };
 
@@ -701,24 +824,38 @@ const MainPage: React.FC = () => {
               onClick={handleDataReset}
               title="Reset form and start fresh"
             >
-              🔄 Reset
+              🔄 Reset Form
+            </button>
+            <button
+              className="btn reset-db-btn"
+              onClick={() => setShowResetDbModal(true)}
+              title="Clear all plans from database"
+            >
+              🗑️ Reset DB
             </button>
             <button
               className="btn sample-data-btn"
               onClick={handleLoadSampleData}
               title="Load sample data (clears existing data)"
             >
-              � Load Sample Data
+              📦 Load Sample Data
             </button>
           </div>
         </nav>
       </header>
       
       <main className="app-main">
+        {saveMessage && (
+          <div className={`save-message ${saveMessage.includes('✅') ? 'success' : 'error'}`}>
+            {saveMessage}
+          </div>
+        )}
         <SalesPlanningForm
           data={salesData}
           onDataChange={handleDataChange}
-          isReadOnly={workflowStatus === 'published'}
+          isReadOnly={workflowStatus === 'review' || workflowStatus === 'approved' || workflowStatus === 'published'}
+          onSave={handleSave}
+          isSaving={isSaving}
           workflowControls={
             <WorkflowControls
               currentStatus={workflowStatus}
@@ -828,6 +965,15 @@ const MainPage: React.FC = () => {
                         <div className="plan-info">
                           <span className="plan-country-year">{plan.country} ({plan.year})</span>
                           <span className="plan-created">Created: {new Date(plan.createdAt).toLocaleDateString()}</span>
+                        </div>
+                        <div className="plan-actions">
+                          <button
+                            className="btn edit-plan-btn"
+                            onClick={() => handleEditPlan(plan)}
+                            title="Edit this plan"
+                          >
+                            ✏️ Edit Plan
+                          </button>
                         </div>
                       </div>
                       
@@ -999,6 +1145,31 @@ const MainPage: React.FC = () => {
           </div>
         )}
       </main>
+
+      {/* Reset Database Confirmation Modal */}
+      {showResetDbModal && (
+        <div className="modal-overlay" onClick={() => setShowResetDbModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <h2>⚠️ Confirm Database Reset</h2>
+            <p>Are you sure you want to clear all plans from the database?</p>
+            <p className="warning-text">This action cannot be undone!</p>
+            <div className="modal-actions">
+              <button
+                className="btn cancel-btn"
+                onClick={() => setShowResetDbModal(false)}
+              >
+                Cancel
+              </button>
+              <button
+                className="btn danger-btn"
+                onClick={handleResetDatabase}
+              >
+                Yes, Clear Database
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
