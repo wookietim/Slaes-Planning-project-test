@@ -144,7 +144,7 @@ const ReviewPage: React.FC = () => {
             country: plan.country,
             year: plan.year || '2025',
             planningPeriod: row.planningPeriod || row.quarter || 'T1',
-            hfb: 'General', // Default HFB since it's not stored in current API structure
+            hfb: row.hfb?.substring(0,6) || 'General', // Default HFB since it's not stored in current API structure
             salesGoal: row.salesGoal,
             actualSales: row.actualSales,
             variance: row.variance,

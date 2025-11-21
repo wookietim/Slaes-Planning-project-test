@@ -2043,7 +2043,7 @@
 
 .reset-row-btn:disabled {
   background-color: #ffe0b2;
-  color: #ffcc02;
+  color: #5c5432;
   cursor: not-allowed;
   transform: none;
   box-shadow: none;
