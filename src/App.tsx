@@ -997,13 +997,13 @@ const MainPage: React.FC = () => {
                               .filter(({ rowKey }) => {
                                 // If row status filter is active, only show rows with matching status
                                 if (filters.status) {
-                                  const rowStatus = rowStatuses[rowKey] || 'pending';
+                                  const rowStatus = rowStatuses[rowKey] || 'draft';
                                   return rowStatus === filters.status;
                                 }
                                 return true; // Show all rows if no status filter
                               })
                               .map(({ row, index, rowKey }) => {
-                              const rowStatus = rowStatuses[rowKey] || 'pending';
+                              const rowStatus = rowStatuses[rowKey] || 'draft';
                               const isEditing = editingRowId === rowKey;
                               
                               return (
