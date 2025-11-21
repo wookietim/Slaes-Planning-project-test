@@ -648,7 +648,7 @@ const MainPage: React.FC = () => {
         {
           country: "USA",
           year: "2025",
-          status: "review",
+          status: "draft",
           user: "timothy.collins@ingka.ikea.com",
           rows: [
             {"planningPeriod": "FY", "hfb": "HFB 01 Living room seating", "salesGoal": 180000, "actualSales": 175000, "variance": -5000, "qty": 720},
@@ -660,7 +660,7 @@ const MainPage: React.FC = () => {
         {
           country: "USA",
           year: "2025", 
-          status: "review",
+          status: "draft",
           user: "timothy.collins@ingka.ikea.com",
           rows: [
             {"planningPeriod": "T1", "hfb": "HFB 01 Living room seating", "salesGoal": 220000, "actualSales": 215000, "variance": -5000, "qty": 880},
@@ -668,11 +668,11 @@ const MainPage: React.FC = () => {
             {"planningPeriod": "T1", "hfb": "HFB 03 Workspaces", "salesGoal": 230000, "actualSales": 235000, "variance": 5000, "qty": 920}
           ]
         },
-        // Sweden 2024
+        // USA 2025
         {
           country: "USA",
           year: "2025",
-          status: "review", 
+          status: "draft", 
           user: "timothy.collins@ingka.ikea.com",
           rows: [
             {"planningPeriod": "T2", "hfb": "HFB 01 Living room seating", "salesGoal": 150000, "actualSales": 145000, "variance": 5000, "qty": 580},
@@ -680,11 +680,11 @@ const MainPage: React.FC = () => {
             {"planningPeriod": "T2", "hfb": "HFB 03 Workspaces", "salesGoal": 155000, "actualSales": 160000, "variance": 5000, "qty": 620}
           ]
         },
-        // Sweden 2025
+        // USA 2025
         {
           country: "USA",
           year: "2025",
-          status: "review",
+          status: "draft",
           user: "timothy.collins@ingka.ikea.com",
           rows: [
             {"planningPeriod": "T3", "hfb": "HFB 01 Living room seating", "salesGoal": 170000, "actualSales": 165000, "variance": -5000, "qty": 680},
