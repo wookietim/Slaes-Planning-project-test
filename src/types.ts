@@ -1,7 +1,7 @@
 // Types for the sales planning form
 export interface SalesDataRow {
   id: string;
-  tertial: string;
+  planningPeriod: string;
   hfb: string;
   turnover: string;
   profit: string;

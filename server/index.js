@@ -41,7 +41,7 @@ function initDatabase() {
     CREATE TABLE IF NOT EXISTS sales_plan_rows (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       plan_id TEXT NOT NULL,
-      tertial TEXT,
+      planning_period TEXT,
       quarter TEXT,
       hfb TEXT,
       sales_goal REAL NOT NULL,
@@ -159,13 +159,13 @@ function initDatabase() {
                 rows.forEach((row, index) => {
                   const insertRowSQL = `
                     INSERT INTO sales_plan_rows 
-                    (plan_id, tertial, quarter, hfb, sales_goal, actual_sales, variance, qty, row_order)
+                    (plan_id, planning_period, quarter, hfb, sales_goal, actual_sales, variance, qty, row_order)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                   `;
                   
                   db.run(insertRowSQL, [
                     plan.id,
-                    row.tertial || null,
+                    row.planningPeriod || row.tertial || null,
                     row.quarter || null,
                     row.hfb || null,
                     row.salesGoal || 0,
@@ -243,7 +243,7 @@ app.get('/api/sales-plans', (req, res) => {
               status: plan.status,
               user: plan.user_email,
               rows: rows.map(row => ({
-                tertial: row.tertial,
+                planningPeriod: row.planning_period,
                 quarter: row.quarter,
                 hfb: row.hfb,
                 salesGoal: row.sales_goal,
@@ -299,7 +299,7 @@ app.get('/api/sales-plans/status/:status', (req, res) => {
               status: plan.status,
               user: plan.user_email,
               rows: rows.map(row => ({
-                tertial: row.tertial,
+                planningPeriod: row.planning_period,
                 quarter: row.quarter,
                 hfb: row.hfb,
                 salesGoal: row.sales_goal,
@@ -361,7 +361,7 @@ app.get('/api/sales-plans/:id', (req, res) => {
         status: plan.status,
         user: plan.user_email,
         rows: rows.map(row => ({
-          tertial: row.tertial,
+          planningPeriod: row.planning_period,
           quarter: row.quarter,
           hfb: row.hfb,
           salesGoal: row.sales_goal,
@@ -401,7 +401,7 @@ app.post('/api/sales-plans', (req, res) => {
     if (rows && rows.length > 0) {
       const insertRowSQL = `
         INSERT INTO sales_plan_rows 
-        (plan_id, tertial, quarter, hfb, sales_goal, actual_sales, variance, qty, row_order)
+        (plan_id, planning_period, quarter, hfb, sales_goal, actual_sales, variance, qty, row_order)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
       `;
       
@@ -411,7 +411,7 @@ app.post('/api/sales-plans', (req, res) => {
       rows.forEach((row, index) => {
         db.run(insertRowSQL, [
           id,
-          row.tertial || null,
+          row.planningPeriod || null,
           row.quarter || null,
           row.hfb || null,
           row.salesGoal || 0,
@@ -478,7 +478,7 @@ app.put('/api/sales-plans/:id', (req, res) => {
       if (rows && rows.length > 0) {
         const insertRowSQL = `
           INSERT INTO sales_plan_rows 
-          (plan_id, tertial, quarter, hfb, sales_goal, actual_sales, variance, qty, row_order)
+          (plan_id, planning_period, quarter, hfb, sales_goal, actual_sales, variance, qty, row_order)
           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         `;
         
@@ -488,7 +488,7 @@ app.put('/api/sales-plans/:id', (req, res) => {
         rows.forEach((row, index) => {
           db.run(insertRowSQL, [
             req.params.id,
-            row.tertial || null,
+            row.planningPeriod || null,
             row.quarter || null,
             row.hfb || null,
             row.salesGoal || 0,

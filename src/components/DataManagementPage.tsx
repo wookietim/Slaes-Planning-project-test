@@ -54,7 +54,7 @@ const DataManagementPage: React.FC = () => {
       year: entry.year || '2025',
       rows: entry.rows.map(row => ({
         id: `${Date.now()}-${Math.random()}`,
-        tertial: row.tertial,
+        planningPeriod: row.planningPeriod,
         hfb: '', // This field isn't used in the new structure
         turnover: row.salesGoal.toString(),
         profit: row.actualSales.toString(),

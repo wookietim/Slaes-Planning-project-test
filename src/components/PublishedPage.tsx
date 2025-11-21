@@ -8,7 +8,7 @@ interface PublishedRowData {
   planId: string;
   country: string;
   year: string;
-  tertial: string;
+  planningPeriod: string;
   hfb: string;
   salesGoal: number;
   actualSales: number;
@@ -102,7 +102,7 @@ const PublishedPage: React.FC = () => {
             planId: plan.id,
             country: plan.country,
             year: plan.year,
-            tertial: row.tertial || '',
+            planningPeriod: row.planningPeriod || '',
             hfb: row.hfb || '',
             salesGoal: row.salesGoal,
             actualSales: row.actualSales,
@@ -336,7 +336,7 @@ const PublishedPage: React.FC = () => {
                 <th></th>
                 <th>Year</th>
                 <th>Country</th>
-                <th>Tertial</th>
+                <th>Planning Period</th>
                 <th>HFB</th>
                 <th>Sales Goal</th>
                 <th>Year-to-Date Sales</th>
@@ -346,7 +346,7 @@ const PublishedPage: React.FC = () => {
             </thead>
             <tbody>
               {filteredRows.map((row, index) => {
-                const rowKey = `${row.planId}-${row.tertial}-${index}`;
+                const rowKey = `${row.planId}-${row.planningPeriod}-${index}`;
                 const isExpanded = expandedRows.has(rowKey);
                 const productDetails = generateProductDetails(row);
                 
@@ -364,7 +364,7 @@ const PublishedPage: React.FC = () => {
                       </td>
                       <td>{row.year}</td>
                       <td>{row.country}</td>
-                      <td>{row.tertial}</td>
+                      <td>{row.planningPeriod}</td>
                       <td>{row.hfb}</td>
                       <td>{row.salesGoal.toLocaleString()}</td>
                       <td>{row.actualSales.toLocaleString()}</td>

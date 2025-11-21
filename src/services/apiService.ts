@@ -1,5 +1,5 @@
 export interface SalesPlanRow {
-  tertial?: string;
+  planningPeriod?: string;
   quarter?: string; // Legacy field for backwards compatibility
   hfb?: string; // HFB field
   salesGoal: number;

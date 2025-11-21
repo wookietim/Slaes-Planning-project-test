@@ -14,7 +14,7 @@ interface ReviewableRow {
   rowIndex: number;
   country: string;
   year: string;
-  tertial: string;
+  planningPeriod: string;
   hfb: string;
   salesGoal: number;
   actualSales: number;
@@ -143,7 +143,7 @@ const ReviewPage: React.FC = () => {
             rowIndex: index,
             country: plan.country,
             year: plan.year || '2025',
-            tertial: row.tertial || row.quarter || 'T1',
+            planningPeriod: row.planningPeriod || row.quarter || 'T1',
             hfb: 'General', // Default HFB since it's not stored in current API structure
             salesGoal: row.salesGoal,
             actualSales: row.actualSales,
@@ -156,12 +156,12 @@ const ReviewPage: React.FC = () => {
       });
     });
 
-    // Sort by year, country, HFB, tertial
+    // Sort by year, country, HFB, planning period
     return allRows.sort((a, b) => {
       if (a.year !== b.year) return a.year.localeCompare(b.year);
       if (a.country !== b.country) return a.country.localeCompare(b.country);
       if (a.hfb !== b.hfb) return a.hfb.localeCompare(b.hfb);
-      return a.tertial.localeCompare(b.tertial);
+      return a.planningPeriod.localeCompare(b.planningPeriod);
     });
   };
 
@@ -328,7 +328,7 @@ const ReviewPage: React.FC = () => {
           ) : (
             <div className="individual-review-section">
               <h2>Review Each Line Individually</h2>
-              <p>Sorted by Year → Country → HFB → Tertial</p>
+              <p>Sorted by Year → Country → HFB → Planning Period</p>
               <div className="review-instructions">
                 <p><strong>Instructions:</strong></p>
                 <p>• ✓ <strong>Approve:</strong> Line will remain visible with "APPROVED" status</p>
@@ -344,7 +344,7 @@ const ReviewPage: React.FC = () => {
                     <th>Year</th>
                     <th>Country</th>
                     <th>HFB</th>
-                    <th>Tertial</th>
+                    <th>Planning Period</th>
                     <th>Sales Goal</th>
                     <th>Actual Sales</th>
                     <th>Variance</th>
@@ -360,7 +360,7 @@ const ReviewPage: React.FC = () => {
                         <td>{row.year}</td>
                         <td>{row.country}</td>
                         <td>{row.hfb}</td>
-                        <td>{row.tertial}</td>
+                        <td>{row.planningPeriod}</td>
                         <td>{row.salesGoal.toLocaleString()}</td>
                         <td>{row.actualSales.toLocaleString()}</td>
                         <td className={row.variance >= 0 ? 'positive-variance' : 'negative-variance'}>

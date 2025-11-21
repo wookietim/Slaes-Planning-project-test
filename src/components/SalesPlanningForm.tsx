@@ -43,12 +43,12 @@ const SalesPlanningForm: React.FC<SalesPlanningFormProps> = ({
   };
 
   const addNewRow = () => {
-    // Get the tertial value from the last row, or default to 'FY'
-    const lastRowTertial = data.rows.length > 0 ? data.rows[data.rows.length - 1].tertial : 'FY';
+    // Get the planning period value from the last row, or default to 'FY'
+    const lastRowPlanningPeriod = data.rows.length > 0 ? data.rows[data.rows.length - 1].planningPeriod : 'FY';
     
     const newRow: SalesDataRow = {
       id: Date.now().toString(),
-      tertial: lastRowTertial,
+      planningPeriod: lastRowPlanningPeriod,
       hfb: '',
       turnover: '',
       profit: '',
@@ -64,10 +64,10 @@ const SalesPlanningForm: React.FC<SalesPlanningFormProps> = ({
   const removeRow = (rowId: string) => {
     if (data.rows.length > 1) {
       const updatedRows = data.rows.filter(row => row.id !== rowId);
-      // Update tertial labels
+      // Update planning period labels
       const reIndexedRows = updatedRows.map((row, index) => ({
         ...row,
-        tertial: `T${index + 1}`
+        planningPeriod: `T${index + 1}`
       }));
       onDataChange({
         ...data,
@@ -118,7 +118,7 @@ const SalesPlanningForm: React.FC<SalesPlanningFormProps> = ({
 
       <div className="form-grid">
         <div className="grid-headers">
-          <div className="header-cell">Tertial</div>
+          <div className="header-cell">Planning Period</div>
           <div className="header-cell">HFB</div>
           <div className="header-cell">Turnover</div>
           <div className="header-cell">Profit</div>
@@ -131,10 +131,10 @@ const SalesPlanningForm: React.FC<SalesPlanningFormProps> = ({
           <div key={row.id} className="grid-row">
             <div className="input-cell">
               <select
-                value={row.tertial}
-                onChange={(e) => handleRowChange(row.id, 'tertial', e.target.value)}
+                value={row.planningPeriod}
+                onChange={(e) => handleRowChange(row.id, 'planningPeriod', e.target.value)}
                 disabled={isReadOnly}
-                className="tertial-select"
+                className="planning-period-select"
               >
                 <option value="FY">FY</option>
                 <option value="T1">T1</option>

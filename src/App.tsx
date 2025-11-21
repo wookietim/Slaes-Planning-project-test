@@ -120,7 +120,7 @@ const MainPage: React.FC = () => {
     year: '2026',
     rows: [{
       id: '1',
-      tertial: 'FY',
+      planningPeriod: 'FY',
       hfb: '',
       turnover: '',
       profit: '',
@@ -249,7 +249,7 @@ const MainPage: React.FC = () => {
           year: data.year,
           status: workflowStatus,
           rows: data.rows.map(row => ({
-            tertial: row.tertial,
+            planningPeriod: row.planningPeriod,
             salesGoal: parseFloat(row.turnover) || 0,
             actualSales: parseFloat(row.profit) || 0,
             variance: parseFloat(row.gm) || 0
@@ -276,7 +276,7 @@ const MainPage: React.FC = () => {
           status: workflowStatus,
           user: currentUser || undefined,
           rows: salesData.rows.map(row => ({
-            tertial: row.tertial,
+            planningPeriod: row.planningPeriod,
             hfb: row.hfb,
             salesGoal: parseFloat(row.turnover) || 0,
             actualSales: parseFloat(row.profit) || 0,
@@ -293,7 +293,7 @@ const MainPage: React.FC = () => {
           status: workflowStatus,
           user: currentUser || undefined,
           rows: salesData.rows.map(row => ({
-            tertial: row.tertial,
+            planningPeriod: row.planningPeriod,
             hfb: row.hfb,
             salesGoal: parseFloat(row.turnover) || 0,
             actualSales: parseFloat(row.profit) || 0,
@@ -341,9 +341,9 @@ const MainPage: React.FC = () => {
           errors.push(`Row ${rowNumber}: HFB must be filled`);
         }
 
-        // Check Tertial
-        if (!row.tertial || row.tertial.trim() === '') {
-          errors.push(`Row ${rowNumber}: Tertial must be filled`);
+        // Check Planning Period
+        if (!row.planningPeriod || row.planningPeriod.trim() === '') {
+          errors.push(`Row ${rowNumber}: Planning Period must be filled`);
         }
 
         // Check Turnover (Sales Goal)
@@ -396,7 +396,7 @@ const MainPage: React.FC = () => {
           status: status,
           user: currentUser || undefined,
           rows: salesData.rows.map(row => ({
-            tertial: row.tertial,
+            planningPeriod: row.planningPeriod,
             hfb: row.hfb,
             salesGoal: parseFloat(row.turnover) || 0,
             actualSales: parseFloat(row.profit) || 0,
@@ -416,7 +416,7 @@ const MainPage: React.FC = () => {
           status: status,
           user: currentUser || undefined,
           rows: salesData.rows.map(row => ({
-            tertial: row.tertial,
+            planningPeriod: row.planningPeriod,
             hfb: row.hfb,
             salesGoal: parseFloat(row.turnover) || 0,
             actualSales: parseFloat(row.profit) || 0,
@@ -439,7 +439,7 @@ const MainPage: React.FC = () => {
       year: '2025',
       rows: [{
         id: '1',
-        tertial: 'FY',
+        planningPeriod: 'FY',
         hfb: '',
         turnover: '',
         profit: '',
@@ -608,7 +608,7 @@ const MainPage: React.FC = () => {
       year: plan.year,
       rows: plan.rows.map((row, index) => ({
         id: `${plan.id}-${index}`,
-        tertial: row.tertial || row.quarter || 'FY',
+        planningPeriod: row.planningPeriod || row.quarter || 'FY',
         hfb: row.hfb || '',
         turnover: row.salesGoal.toString(),
         profit: row.actualSales.toString(),
@@ -651,9 +651,9 @@ const MainPage: React.FC = () => {
           status: "review",
           user: "timothy.collins@ingka.ikea.com",
           rows: [
-            {"tertial": "FY", "hfb": "HFB 01 Living room seating", "salesGoal": 180000, "actualSales": 175000, "variance": -5000, "qty": 720},
-            {"tertial": "FY", "hfb": "HFB 02 Store and organise furniture", "salesGoal": 200000, "actualSales": 210000, "variance": 10000, "qty": 800},
-            {"tertial": "FY", "hfb": "HFB 03 Workspaces", "salesGoal": 190000, "actualSales": 195000, "variance": 5000, "qty": 760}
+            {"planningPeriod": "FY", "hfb": "HFB 01 Living room seating", "salesGoal": 180000, "actualSales": 175000, "variance": -5000, "qty": 720},
+            {"planningPeriod": "FY", "hfb": "HFB 02 Store and organise furniture", "salesGoal": 200000, "actualSales": 210000, "variance": 10000, "qty": 800},
+            {"planningPeriod": "FY", "hfb": "HFB 03 Workspaces", "salesGoal": 190000, "actualSales": 195000, "variance": 5000, "qty": 760}
           ]
         },
         // USA 2025
@@ -663,9 +663,9 @@ const MainPage: React.FC = () => {
           status: "review",
           user: "timothy.collins@ingka.ikea.com",
           rows: [
-            {"tertial": "T1", "hfb": "HFB 01 Living room seating", "salesGoal": 220000, "actualSales": 215000, "variance": -5000, "qty": 880},
-            {"tertial": "T1", "hfb": "HFB 02 Store and organise furniture", "salesGoal": 240000, "actualSales": 250000, "variance": 10000, "qty": 960},
-            {"tertial": "T1", "hfb": "HFB 03 Workspaces", "salesGoal": 230000, "actualSales": 235000, "variance": 5000, "qty": 920}
+            {"planningPeriod": "T1", "hfb": "HFB 01 Living room seating", "salesGoal": 220000, "actualSales": 215000, "variance": -5000, "qty": 880},
+            {"planningPeriod": "T1", "hfb": "HFB 02 Store and organise furniture", "salesGoal": 240000, "actualSales": 250000, "variance": 10000, "qty": 960},
+            {"planningPeriod": "T1", "hfb": "HFB 03 Workspaces", "salesGoal": 230000, "actualSales": 235000, "variance": 5000, "qty": 920}
           ]
         },
         // Sweden 2024
@@ -675,9 +675,9 @@ const MainPage: React.FC = () => {
           status: "review", 
           user: "timothy.collins@ingka.ikea.com",
           rows: [
-            {"tertial": "T2", "hfb": "HFB 01 Living room seating", "salesGoal": 150000, "actualSales": 145000, "variance": 5000, "qty": 580},
-            {"tertial": "T2", "hfb": "HFB 02 Store and organise furniture", "salesGoal": 160000, "actualSales": 170000, "variance": 10000, "qty": 640},
-            {"tertial": "T2", "hfb": "HFB 03 Workspaces", "salesGoal": 155000, "actualSales": 160000, "variance": 5000, "qty": 620}
+            {"planningPeriod": "T2", "hfb": "HFB 01 Living room seating", "salesGoal": 150000, "actualSales": 145000, "variance": 5000, "qty": 580},
+            {"planningPeriod": "T2", "hfb": "HFB 02 Store and organise furniture", "salesGoal": 160000, "actualSales": 170000, "variance": 10000, "qty": 640},
+            {"planningPeriod": "T2", "hfb": "HFB 03 Workspaces", "salesGoal": 155000, "actualSales": 160000, "variance": 5000, "qty": 620}
           ]
         },
         // Sweden 2025
@@ -687,9 +687,9 @@ const MainPage: React.FC = () => {
           status: "review",
           user: "timothy.collins@ingka.ikea.com",
           rows: [
-            {"tertial": "T3", "hfb": "HFB 01 Living room seating", "salesGoal": 170000, "actualSales": 165000, "variance": -5000, "qty": 680},
-            {"tertial": "T3", "hfb": "HFB 02 Store and organise furniture", "salesGoal": 180000, "actualSales": 190000, "variance": 10000, "qty": 720},
-            {"tertial": "T3", "hfb": "HFB 03 Workspaces", "salesGoal": 175000, "actualSales": 180000, "variance": 5000, "qty": 700}
+            {"planningPeriod": "T3", "hfb": "HFB 01 Living room seating", "salesGoal": 170000, "actualSales": 165000, "variance": -5000, "qty": 680},
+            {"planningPeriod": "T3", "hfb": "HFB 02 Store and organise furniture", "salesGoal": 180000, "actualSales": 190000, "variance": 10000, "qty": 720},
+            {"planningPeriod": "T3", "hfb": "HFB 03 Workspaces", "salesGoal": 175000, "actualSales": 180000, "variance": 5000, "qty": 700}
           ]
         }
       ];
@@ -719,7 +719,7 @@ const MainPage: React.FC = () => {
         year: '2025',
         rows: [{
           id: '1',
-          tertial: 'FY',
+          planningPeriod: 'FY',
           hfb: '',
           turnover: '',
           profit: '',
@@ -753,7 +753,7 @@ const MainPage: React.FC = () => {
         year: '2025',
         rows: [{
           id: '1',
-          tertial: 'FY',
+          planningPeriod: 'FY',
           hfb: '',
           turnover: '',
           profit: '',
@@ -950,13 +950,13 @@ const MainPage: React.FC = () => {
                     if (a.year !== b.year) return a.year.localeCompare(b.year);
                     // Then by country
                     if (a.country !== b.country) return a.country.localeCompare(b.country);
-                    // Finally by tertial (sort rows within each plan)
+                    // Finally by planning period (sort rows within each plan)
                     return 0;
                   })
                   .map((plan) => {
-                  // Sort rows within each plan by tertial
+                  // Sort rows within each plan by planning period
                   const sortedRows = [...plan.rows].sort((a, b) => 
-                    (a.tertial || a.quarter || 'T1').localeCompare(b.tertial || b.quarter || 'T1')
+                    (a.planningPeriod || a.quarter || 'T1').localeCompare(b.planningPeriod || b.quarter || 'T1')
                   );
                   
                   return (
@@ -981,7 +981,7 @@ const MainPage: React.FC = () => {
                         <table>
                           <thead>
                             <tr>
-                              <th>Tertial</th>
+                              <th>Planning Period</th>
                               <th>HFB</th>
                               <th>Turnover</th>
                               <th>Profit</th>
@@ -1008,7 +1008,7 @@ const MainPage: React.FC = () => {
                               
                               return (
                               <tr key={index} className={isEditing ? 'editing-row' : ''}>
-                                <td>{row.tertial || row.quarter || 'T1'}</td>
+                                <td>{row.planningPeriod || row.quarter || 'T1'}</td>
                                 <td>{row.hfb || '-'}</td>
                                 <td>
                                   {isEditing ? (
