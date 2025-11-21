@@ -29,7 +29,12 @@ npm install
 npm run dev
 ```
 
-3. Open your browser and navigate to `http://localhost:5173`
+3. Open a 2nd terminal and run the 'backend':
+```bash
+npm run server
+```
+
+4. Open your browser and navigate to `http://localhost:5173`
 
 ### Available Scripts
 
