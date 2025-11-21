@@ -1876,6 +1876,28 @@
   margin-bottom: 25px;
 }
 
+.review-plan-group {
+  background-color: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.review-plan-header {
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #0058a3;
+}
+
+.review-plan-header h3 {
+  margin: 0;
+  color: #0058a3;
+  font-size: 18px;
+  font-weight: 600;
+}
+
 .individual-review-table table {
   width: 100%;
   border-collapse: collapse;

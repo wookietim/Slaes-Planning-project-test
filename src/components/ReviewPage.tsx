@@ -19,6 +19,7 @@ interface ReviewableRow {
   salesGoal: number;
   actualSales: number;
   variance: number;
+  qty: number;
   status: 'pending' | 'approved' | 'denied' | 'published';
   createdAt: Date;
   updatedAt: Date;
@@ -148,6 +149,7 @@ const ReviewPage: React.FC = () => {
             salesGoal: row.salesGoal,
             actualSales: row.actualSales,
             variance: row.variance,
+            qty: row.qty || 0,
             status: status,
             createdAt: plan.createdAt,
             updatedAt: plan.updatedAt
@@ -156,11 +158,10 @@ const ReviewPage: React.FC = () => {
       });
     });
 
-    // Sort by year, country, HFB, planning period
+    // Sort by year, country, then planning period (to match Main page grouping)
     return allRows.sort((a, b) => {
       if (a.year !== b.year) return a.year.localeCompare(b.year);
       if (a.country !== b.country) return a.country.localeCompare(b.country);
-      if (a.hfb !== b.hfb) return a.hfb.localeCompare(b.hfb);
       return a.planningPeriod.localeCompare(b.planningPeriod);
     });
   };
@@ -328,7 +329,7 @@ const ReviewPage: React.FC = () => {
           ) : (
             <div className="individual-review-section">
               <h2>Review Each Line Individually</h2>
-              <p>Sorted by Year → Country → HFB → Planning Period</p>
+              <p>Grouped by Country & Year, sorted by Planning Period</p>
               <div className="review-instructions">
                 <p><strong>Instructions:</strong></p>
                 <p>• ✓ <strong>Approve:</strong> Line will remain visible with "APPROVED" status</p>
@@ -338,76 +339,96 @@ const ReviewPage: React.FC = () => {
               </div>
               
               <div className="individual-review-table">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Year</th>
-                    <th>Country</th>
-                    <th>HFB</th>
-                    <th>Planning Period</th>
-                    <th>Sales Goal</th>
-                    <th>Actual Sales</th>
-                    <th>Variance</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {reviewableRows.map((row) => {
-                    const rowKey = `${row.planId}-${row.rowIndex}`;
-                    return (
-                      <tr key={rowKey} className={`row-${row.status}`}>
-                        <td>{row.year}</td>
-                        <td>{row.country}</td>
-                        <td>{row.hfb}</td>
-                        <td>{row.planningPeriod}</td>
-                        <td>{row.salesGoal.toLocaleString()}</td>
-                        <td>{row.actualSales.toLocaleString()}</td>
-                        <td className={row.variance >= 0 ? 'positive-variance' : 'negative-variance'}>
-                          {row.variance > 0 ? '+' : ''}{row.variance.toLocaleString()}
-                        </td>
-                        <td>
-                          <span className={`row-status-badge ${row.status}`}>
-                            {row.status.toUpperCase()}
-                          </span>
-                        </td>
-                        <td className="action-buttons">
-                          <button
-                            className="btn approve-row-btn"
-                            onClick={() => handleRowApprove(rowKey)}
-                            disabled={row.status === 'approved' || row.status === 'published'}
-                          >
-                            ✓
-                          </button>
-                          <button
-                            className="btn deny-row-btn"
-                            onClick={() => handleRowDeny(rowKey)}
-                            disabled={row.status === 'denied'}
-                          >
-                            ✗
-                          </button>
-                          {row.status === 'approved' && (
-                            <button
-                              className="btn publish-row-btn"
-                              onClick={() => handleRowPublish(rowKey)}
-                              title="Publish this approved line"
-                            >
-                              📤 Publish
-                            </button>
-                          )}
-                          <button
-                            className="btn reset-row-btn"
-                            onClick={() => handleRowReset(rowKey)}
-                            disabled={row.status === 'pending'}
-                          >
-                            Reset
-                          </button>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+              {(() => {
+                // Group rows by planId (which represents Country + Year)
+                const groupedRows = reviewableRows.reduce((acc, row) => {
+                  if (!acc[row.planId]) {
+                    acc[row.planId] = {
+                      country: row.country,
+                      year: row.year,
+                      rows: []
+                    };
+                  }
+                  acc[row.planId].rows.push(row);
+                  return acc;
+                }, {} as Record<string, { country: string; year: string; rows: typeof reviewableRows }>);
+
+                return Object.entries(groupedRows).map(([planId, group]) => (
+                  <div key={planId} className="review-plan-group">
+                    <div className="review-plan-header">
+                      <h3>{group.country} ({group.year})</h3>
+                    </div>
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>Planning Period</th>
+                          <th>HFB</th>
+                          <th>Turnover</th>
+                          <th>Profit</th>
+                          <th>Qty</th>
+                          <th>GM</th>
+                          <th>Status</th>
+                          <th>Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {group.rows.map((row) => {
+                          const rowKey = `${row.planId}-${row.rowIndex}`;
+                          return (
+                            <tr key={rowKey} className={`row-${row.status}`}>
+                              <td>{row.planningPeriod}</td>
+                              <td>{row.hfb}</td>
+                              <td>{row.salesGoal.toLocaleString()}</td>
+                              <td>{row.actualSales.toLocaleString()}</td>
+                              <td>{row.qty.toLocaleString()}</td>
+                              <td className={row.variance >= 0 ? 'positive-variance' : 'negative-variance'}>
+                                {row.variance > 0 ? '+' : ''}{row.variance.toLocaleString()}
+                              </td>
+                              <td>
+                                <span className={`row-status-badge ${row.status}`}>
+                                  {row.status.toUpperCase()}
+                                </span>
+                              </td>
+                              <td className="action-buttons">
+                                <button
+                                  className="btn approve-row-btn"
+                                  onClick={() => handleRowApprove(rowKey)}
+                                  disabled={row.status === 'approved' || row.status === 'published'}
+                                >
+                                  ✓
+                                </button>
+                                <button
+                                  className="btn deny-row-btn"
+                                  onClick={() => handleRowDeny(rowKey)}
+                                  disabled={row.status === 'denied'}
+                                >
+                                  ✗
+                                </button>
+                                {row.status === 'approved' && (
+                                  <button
+                                    className="btn publish-row-btn"
+                                    onClick={() => handleRowPublish(rowKey)}
+                                    title="Publish this approved line"
+                                  >
+                                    📤 Publish
+                                  </button>
+                                )}
+                                <button
+                                  className="btn reset-row-btn"
+                                  onClick={() => handleRowReset(rowKey)}
+                                  disabled={row.status === 'pending'}
+                                >
+                                  Reset
+                                </button>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                ));
+              })()}
             </div>
 
             <div className="review-summary">
