@@ -3,6 +3,7 @@ import { useLocation, useSearchParams, useNavigate } from 'react-router-dom';
 import { SalesData } from '../types';
 import apiService, { SalesPlan } from '../services/apiService';
 import DateTimeWeatherWidget from './DateTimeWeatherWidget.tsx';
+import AppHeader from './AppHeader.tsx';
 
 interface LocationState {
   salesData: SalesData;
@@ -265,48 +266,8 @@ const ReviewPage: React.FC = () => {
   return (
     <div className="review-page">
       <DateTimeWeatherWidget />
+      <AppHeader />
       <div className="review-container">
-        <header className="app-header">
-          <h1>IKEA Sales Planning</h1>
-          
-          {/* Tab Navigation */}
-          <nav className="app-tabs">
-            <div className="tab-container">
-              {isInputUser && (
-                <button 
-                  className="tab"
-                  onClick={() => navigate('/main')}
-                >
-                  📋 Main
-                </button>
-              )}
-              {isReviewer && (
-                <button className="tab active">
-                  📝 Review
-                </button>
-              )}
-              <button 
-                className="tab"
-                onClick={() => navigate('/published')}
-              >
-                📊 Published
-              </button>
-              {isAdmin && (
-                <button 
-                  className="tab"
-                  onClick={() => navigate('/admin')}
-                >
-                  🔧 Admin
-                </button>
-              )}
-            </div>
-            
-            <div className="app-actions">
-              {/* Navigation handled by tabs - no need for back button */}
-            </div>
-          </nav>
-        </header>
-
         <div className="review-content">
           {reviewableRows.length === 0 ? (
             <div className="no-data">

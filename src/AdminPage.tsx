@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DateTimeWeatherWidget from './components/DateTimeWeatherWidget.tsx';
+import AppHeader from './components/AppHeader.tsx';
 
 interface UserRoles {
   inputUser: boolean;
@@ -17,7 +18,7 @@ const AdminPage: React.FC = () => {
   
   const predefinedUsers = [
     'timothy.collins@ingka.ikea.com',
-    'bschilke@ingka.ikea.com'
+    'benjamin.schilke@ingka.ikea.com'
   ];
 
   // Check if current user has reviewer role
@@ -279,46 +280,7 @@ const AdminPage: React.FC = () => {
   return (
     <div className="admin-page">
       <DateTimeWeatherWidget />
-      <header className="app-header">
-        <h1>IKEA Sales Planning</h1>
-        
-        {/* Tab Navigation */}
-        <nav className="app-tabs">
-          <div className="tab-container">
-            {isInputUser && (
-              <button 
-                className="tab"
-                onClick={() => navigate('/main')}
-              >
-                📋 Main
-              </button>
-            )}
-            {isReviewer && (
-              <button 
-                className="tab"
-                onClick={() => navigate('/review')}
-              >
-                📝 Review
-              </button>
-            )}
-            <button 
-              className="tab"
-              onClick={() => navigate('/published')}
-            >
-              📊 Published
-            </button>
-            {isAdmin && (
-              <button className="tab active">
-                🔧 Admin
-              </button>
-            )}
-          </div>
-          
-          <div className="app-actions">
-            {/* Navigation handled by tabs - no need for back button */}
-          </div>
-        </nav>
-      </header>
+      <AppHeader />
 
       <div className="admin-content">
         <div className="admin-section-header">
@@ -338,7 +300,7 @@ const AdminPage: React.FC = () => {
               <thead>
                 <tr>
                   <th>User Email</th>
-                  <th>Input User</th>
+                  <th>Planner</th>
                   <th>Reviewer</th>
                   <th>Admin</th>
                   <th>Status</th>

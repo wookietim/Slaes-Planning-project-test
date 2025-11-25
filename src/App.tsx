@@ -10,6 +10,7 @@ import LoginPage from './components/LoginPage.tsx';
 import DataManagementPage from './components/DataManagementPage.tsx';
 import AdminPage from './AdminPage.tsx';
 import DateTimeWeatherWidget from './components/DateTimeWeatherWidget.tsx';
+import AppHeader from './components/AppHeader.tsx';
 import './App.css';
 
 // Route protection component
@@ -211,11 +212,11 @@ const MainPage: React.FC = () => {
       const currentUser = localStorage.getItem('currentUser');
       
       // Filter plans to only show entries for the current user
-      const userPlans = currentUser 
-        ? plans.filter(plan => plan.user === currentUser)
-        : plans;
+      // const userPlans = currentUser 
+      //   ? plans.filter(plan => plan.user === currentUser)
+      //   : plans;
       
-      setExistingPlans(userPlans);
+      setExistingPlans(plans);
     } catch (error) {
       console.error('Failed to load existing plans:', error);
     }
@@ -782,67 +783,34 @@ const MainPage: React.FC = () => {
   return (
     <div className="app">
       <DateTimeWeatherWidget />
-      <header className="app-header">
-        <h1>IKEA Sales Planning</h1>
-        
-        {/* Tab Navigation */}
-        <nav className="app-tabs">
-          <div className="tab-container">
-            {isInputUser && (
-              <button className="tab active">
-                📋 Main
-              </button>
-            )}
-            {isReviewer && (
-              <button 
-                className="tab"
-                onClick={() => navigate('/review')}
-              >
-                📝 Review
-              </button>
-            )}
-            <button 
-              className="tab"
-              onClick={() => navigate('/published')}
-            >
-              📊 Published
-            </button>
-            {isAdmin && (
-              <button 
-                className="tab"
-                onClick={() => navigate('/admin')}
-              >
-                🔧 Admin
-              </button>
-            )}
-          </div>
-          
-          {/* Action buttons moved to a separate section */}
-          <div className="app-actions">
-            <button 
-              className="btn reset-btn"
-              onClick={handleDataReset}
-              title="Reset form and start fresh"
-            >
-              🔄 Reset Form
-            </button>
-            <button
-              className="btn reset-db-btn"
-              onClick={() => setShowResetDbModal(true)}
-              title="Clear all plans from database"
-            >
-              🗑️ Reset DB
-            </button>
-            <button
-              className="btn sample-data-btn"
-              onClick={handleLoadSampleData}
-              title="Load sample data (clears existing data)"
-            >
-              📦 Load Sample Data
-            </button>
-          </div>
-        </nav>
-      </header>
+      <AppHeader />
+      
+      {/* Action buttons section */}
+      <div className="main-page-actions">
+        <div className="app-actions">
+          <button 
+            className="btn reset-btn"
+            onClick={handleDataReset}
+            title="Reset form and start fresh"
+          >
+            🔄 Reset Form
+          </button>
+          <button
+            className="btn reset-db-btn"
+            onClick={() => setShowResetDbModal(true)}
+            title="Clear all plans from database"
+          >
+            🗑️ Reset DB
+          </button>
+          <button
+            className="btn sample-data-btn"
+            onClick={handleLoadSampleData}
+            title="Load sample data (clears existing data)"
+          >
+            📦 Load Sample Data
+          </button>
+        </div>
+      </div>
       
       <main className="app-main">
         {saveMessage && (

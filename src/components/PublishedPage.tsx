@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import apiService, { SalesPlan } from '../services/apiService';
 import DateTimeWeatherWidget from './DateTimeWeatherWidget.tsx';
+import AppHeader from './AppHeader.tsx';
 import './PublishedPage.css';
 
 interface PublishedRowData {
@@ -114,10 +115,11 @@ const PublishedPage: React.FC = () => {
       });
     });
 
-    // Sort by year (desc), country (asc), hfb (asc)
+    // Sort by year (desc), country (asc), planning period (asc), hfb (asc)
     return rows.sort((a, b) => {
       if (a.year !== b.year) return b.year.localeCompare(a.year);
       if (a.country !== b.country) return a.country.localeCompare(b.country);
+      if (a.planningPeriod !== b.planningPeriod) return a.planningPeriod.localeCompare(b.planningPeriod);
       return a.hfb.localeCompare(b.hfb);
     });
   }, [publishedPlans]);
@@ -217,46 +219,7 @@ const PublishedPage: React.FC = () => {
   return (
     <div className="published-page">
       <DateTimeWeatherWidget />
-      <header className="app-header">
-        <h1>IKEA Sales Planning</h1>
-        
-        {/* Tab Navigation */}
-        <nav className="app-tabs">
-          <div className="tab-container">
-            {isInputUser && (
-              <button 
-                className="tab"
-                onClick={() => navigate('/main')}
-              >
-                📋 Main
-              </button>
-            )}
-            {isReviewer && (
-              <button 
-                className="tab"
-                onClick={() => navigate('/review')}
-              >
-                📝 Review
-              </button>
-            )}
-            <button className="tab active">
-              📊 Published
-            </button>
-            {isAdmin && (
-              <button 
-                className="tab"
-                onClick={() => navigate('/admin')}
-              >
-                🔧 Admin
-              </button>
-            )}
-          </div>
-          
-          <div className="app-actions">
-            {/* Navigation handled by tabs - no need for back button */}
-          </div>
-        </nav>
-      </header>
+      <AppHeader />
 
       <div className="published-filters">
         <div className="filter-group">
@@ -339,7 +302,7 @@ const PublishedPage: React.FC = () => {
                 <th>Planning Period</th>
                 <th>HFB</th>
                 <th>Sales Goal</th>
-                <th>Year-to-Date Sales</th>
+                <th>Year-to-Date Sales?</th>
                 <th>Variance</th>
                 <th>Published Date</th>
               </tr>

@@ -24,7 +24,7 @@ const LoginPage: React.FC = () => {
         console.log('Initializing default roles for timothy.collins');
         const predefinedUsers = [
           'timothy.collins@ingka.ikea.com',
-          'bschilke@ingka.ikea.com'
+          'benjamin.schilke@ingka.ikea.com'
         ];
         const defaultUsers: any = {};
         predefinedUsers.forEach(userEmail => {
