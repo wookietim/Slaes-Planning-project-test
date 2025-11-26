@@ -9,16 +9,12 @@ const AppHeader: React.FC = () => {
   const checkUserRole = (role: 'inputUser' | 'reviewer' | 'admin'): boolean => {
     const currentUser = localStorage.getItem('currentUser');
     if (!currentUser) return false;
-    
+        
     // Special case for timothy.collins - always grant admin access
     if (currentUser === 'timothy.collins@ingka.ikea.com' && role === 'admin') {
       return true;
     }
-    
-    // Special case for timothy.collins - grant all roles
-    if (currentUser === 'timothy.collins@ingka.ikea.com') {
-      return true;
-    }
+
     
     const userRoles = localStorage.getItem('userRoles');
     if (!userRoles) return false;
@@ -59,7 +55,7 @@ const AppHeader: React.FC = () => {
               className={`tab ${isActive('/main') ? 'active' : ''}`}
               onClick={() => navigate('/main')}
             >
-              📋 Main
+              📋 Plan
             </button>
           )}
           {isReviewer && (

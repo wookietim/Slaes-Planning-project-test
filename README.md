@@ -58,12 +58,12 @@ src/
 ```
 
 ## Workflow States
-
+*Are we using these consistently?*
 1. **Draft** - Initial state for new entries
-2. **Review** - Submitted for review and approval
+2. **Pending** - Submitted for review and approval
 3. **Approved** - Approved by reviewer
-4. **Published** - Final published state
-5. **Versioning** - Option to create new version from published state
+4. **Rejected** - Rejected by reviewer
+5. **Published** - Final published state
 
 ## Usage
 

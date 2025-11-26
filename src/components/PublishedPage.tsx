@@ -127,7 +127,7 @@ const PublishedPage: React.FC = () => {
   // Filter options - consistent with main page
   const getFilterOptions = () => {
     // Fixed year range from 2020 to 2025 (same as main page)
-    const years = Array.from({ length: 6 }, (_, i) => (2020 + i).toString());
+    const years = Array.from({ length: 11 }, (_, i) => (2020 + i).toString());
     
     // Fixed country options (same as main page) 
     const countries = ['Sweden', 'Denmark', 'Norway', 'Finland', 'USA'].sort();
@@ -302,7 +302,7 @@ const PublishedPage: React.FC = () => {
                 <th>Planning Period</th>
                 <th>HFB</th>
                 <th>Sales Goal</th>
-                <th>Year-to-Date Sales?</th>
+                <th>Year-to-Date Sales</th>
                 <th>Variance</th>
                 <th>Published Date</th>
               </tr>
